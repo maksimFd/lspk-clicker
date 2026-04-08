@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>LSPK Clicker</title>
+    
+    <!-- КРИТИЧЕСКИ ВАЖНО: Telegram Web App API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0E14;
+            color: #EAECEF;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        @keyframes float-up { 
+            0% { transform: translateY(0) scale(1); opacity: 1; } 
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; } 
+        }
+        .animate-float-up { animation: float-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .coin-shadow { 
+            box-shadow: 0 10px 40px rgba(252, 213, 53, 0.2), inset 0 -10px 20px rgba(202, 138, 4, 0.6), inset 0 10px 20px rgba(255, 255, 255, 0.4); 
+        }
+
+        @keyframes loading {
+            0% { transform: scaleX(0); }
+            50% { transform: scaleX(0.6); }
+            100% { transform: scaleX(1); }
+        }
+        .animate-loading { animation: loading 2s ease-in-out forwards; transform-origin: left; }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(0.95); opacity: 0.8; filter: drop-shadow(0 0 20px rgba(252,213,53,0.4)); }
+            100% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 40px rgba(252,213,53,0.8)); }
+        }
+        .animate-pulse-glow { animation: pulse-glow 2s infinite alternate ease-in-out; }
+    </style>
+</head>
+<body class="flex h-[100dvh] w-full items-center justify-center overflow-hidden">
+
+    <!-- EКРАН ЗАГРУЗКИ -->
+    <div id="loading-screen" class="flex h-full w-full max-w-[430px] flex-col items-center justify-center bg-[#0B0E14] text-[#FCD535] relative overflow-hidden font-sans z-[1000] sm:border-x border-[#2B3139]">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(252,213,53,0.15)_0,transparent_60%)] animate-pulse"></div>
+        <div class="flex flex-col items-center z-10 w-full px-8">
+            <div class="relative w-40 h-40 mb-8 flex items-center justify-center">
+                
+                <!-- Прямой SVG для экрана загрузки (без hidden) -->
+                <svg viewBox="0 0 400 400" class="w-full h-full animate-pulse-glow drop-shadow-2xl">
+                    <defs>
+                        <linearGradient id="gold-bright" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFF8E1" /><stop offset="25%" stop-color="#FFE082" />
+                            <stop offset="50%" stop-color="#FFB300" /><stop offset="75%" stop-color="#FF8F00" />
+                            <stop offset="100%" stop-color="#E65100" />
+                        </linearGradient>
+                        <linearGradient id="gold-dark" x1="100%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stop-color="#3E2723" /><stop offset="50%" stop-color="#FF6F00" />
+                            <stop offset="100%" stop-color="#FFC107" />
+                        </linearGradient>
+                        <radialGradient id="cyber-core" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#263238" /><stop offset="70%" stop-color="#11151C" />
+                            <stop offset="100%" stop-color="#000000" />
+                        </radialGradient>
+                        <filter id="inner-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feOffset dx="0" dy="15"/><feGaussianBlur stdDeviation="15" result="offset-blur"/>
+                            <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+                            <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
+                            <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+                            <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+                        </filter>
+                        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                        </filter>
+                    </defs>
+
+                    <circle cx="200" cy="210" r="185" fill="#000" opacity="0.6" filter="blur(10px)" />
+                    <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-dark)" stroke-width="24" stroke-dasharray="8 6" />
+                    <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-bright)" stroke-width="12" />
+                    <circle cx="200" cy="200" r="179" fill="url(#gold-dark)" />
+                    <circle cx="200" cy="200" r="170" fill="url(#gold-bright)" />
+                    <circle cx="200" cy="200" r="150" fill="url(#cyber-core)" filter="url(#inner-shadow)" />
+                    <circle cx="200" cy="200" r="150" fill="none" stroke="#FFA000" stroke-width="2" opacity="0.5" />
+                    
+                    <g class="origin-center animate-[spin_15s_linear_infinite]">
+                        <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.4" />
+                        <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="3" stroke-dasharray="40 120" opacity="0.8" filter="url(#neon-glow)" />
+                    </g>
+                    <g class="origin-center animate-[spin_20s_linear_infinite_reverse]">
+                        <path d="M 200 65 L 205 75 L 215 75 L 210 85 L 215 95 L 205 95 L 200 105 L 195 95 L 185 95 L 190 85 L 185 75 L 195 75 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                        <path d="M 200 295 L 205 305 L 215 305 L 210 315 L 215 325 L 205 325 L 200 335 L 195 325 L 185 325 L 190 315 L 185 305 L 195 305 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                        <path d="M 65 200 L 75 195 L 75 185 L 85 190 L 95 185 L 95 195 L 105 200 L 95 205 L 95 215 L 85 210 L 75 215 L 75 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                        <path d="M 295 200 L 305 195 L 305 185 L 315 190 L 325 185 L 325 195 L 335 200 L 325 205 L 325 215 L 315 210 L 305 215 L 305 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                    </g>
+
+                    <path d="M 110 110 L 140 140 L 140 260 L 110 290 M 290 110 L 260 140 L 260 260 L 290 290" fill="none" stroke="#FF8F00" stroke-width="2" opacity="0.3" />
+                    <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="url(#gold-dark)" opacity="0.4" />
+                    <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="none" stroke="#FFC107" stroke-width="3" filter="url(#neon-glow)" />
+
+                    <text x="200" y="215" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="#000" text-anchor="middle" letter-spacing="2">LSPK</text>
+                    <text x="200" y="210" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="url(#gold-bright)" text-anchor="middle" letter-spacing="2" filter="url(#neon-glow)">LSPK</text>
+                    <text x="200" y="255" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFCA28" text-anchor="middle" letter-spacing="10" opacity="0.8">TOKEN</text>
+                    
+                    <path d="M 60 200 A 140 140 0 0 1 340 200" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.1" filter="blur(2px)"/>
+                    <path d="M 90 120 A 130 130 0 0 1 200 70" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.4" />
+                </svg>
+
+            </div>
+            <h1 class="text-4xl font-black text-white tracking-widest mb-2 drop-shadow-md">LSPK</h1>
+            <p class="text-[#848E9C] text-[10px] uppercase tracking-[0.3em] mb-12 font-bold text-center">Загрузка модулей...</p>
+            <div class="w-full max-w-[200px] h-1.5 bg-[#2B3139] rounded-full overflow-hidden relative">
+                <div class="h-full bg-gradient-to-r from-[#FEE140] to-[#F3BA2F] w-full rounded-full animate-loading"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+    <div id="app-container" class="hidden flex h-full w-full max-w-[430px] flex-col bg-[#0B0E14] relative sm:border-x border-[#2B3139]">
+        
+        <!-- Уведомления -->
+        <div id="notification-toast" class="hidden absolute top-8 left-1/2 -translate-x-1/2 bg-[#181A20] border border-white/10 text-white px-5 py-3 rounded-2xl font-bold text-xs z-[100] flex items-center gap-3 shadow-2xl backdrop-blur-md max-w-[80%] text-center transition-all duration-300 opacity-0 translate-y-[-20px]">
+            <i data-lucide="check-circle-2" class="text-[#0ECB81] shrink-0" width="16" height="16"></i> 
+            <span id="notification-text"></span>
+        </div>
+
+        <!-- Основной контент -->
+        <main class="flex-1 flex flex-col min-h-0 overflow-y-auto no-scrollbar w-full pt-2" id="main-scroll-area">
+            
+            <!-- Глобальный баланс LSPK -->
+            <div id="global-balance-header" class="flex flex-col items-center justify-center pt-10 pb-4 shrink-0 transition-opacity">
+              <span class="text-[#848E9C] text-[10px] font-bold tracking-widest uppercase mb-1">Баланс LSPK</span>
+              <div class="text-4xl font-black text-white font-mono" id="ui-main-balance">0</div>
+            </div>
+
+            <!-- Вкладка: КЛИКЕР -->
+            <div id="tab-mine" class="flex-1 flex flex-col items-center justify-between px-5 pb-4">
+              <div class="flex items-center gap-3 w-full max-w-[300px]">
+                <div class="flex-1 bg-[#181A20] rounded-xl p-3 border border-[#2B3139] flex flex-col items-center">
+                  <span class="text-[#848E9C] text-[10px] uppercase font-bold">За тап</span>
+                  <div class="text-white font-bold text-sm">+<span id="ui-click-power">1</span></div>
+                </div>
+                <div class="flex-1 bg-[#181A20] rounded-xl p-3 border border-[#2B3139] flex flex-col items-center">
+                  <span class="text-[#848E9C] text-[10px] uppercase font-bold">Офлайн</span>
+                  <div class="text-white font-bold text-sm"><span id="ui-auto-rate">0</span>/сек</div>
+                </div>
+              </div>
+
+              <div class="flex-1 flex items-center justify-center my-4 w-full">
+                <!-- Главная кнопка кликера -->
+                <button id="coin-button" style="touch-action: manipulation;" class="relative rounded-full transition-transform active:scale-[0.96] w-[clamp(200px,65vw,300px)] aspect-square group focus:outline-none select-none">
+                  <div class="absolute inset-0 rounded-full bg-[#FCD535] blur-3xl opacity-20 group-active:opacity-40 transition-opacity duration-200"></div>
+                  
+                  <!-- Прямой SVG для кнопки -->
+                  <svg viewBox="0 0 400 400" class="w-full h-full drop-shadow-2xl pointer-events-none">
+                      <defs>
+                          <linearGradient id="gold-bright-btn" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#FFF8E1" /><stop offset="25%" stop-color="#FFE082" />
+                              <stop offset="50%" stop-color="#FFB300" /><stop offset="75%" stop-color="#FF8F00" />
+                              <stop offset="100%" stop-color="#E65100" />
+                          </linearGradient>
+                          <linearGradient id="gold-dark-btn" x1="100%" y1="100%" x2="0%" y2="0%">
+                              <stop offset="0%" stop-color="#3E2723" /><stop offset="50%" stop-color="#FF6F00" />
+                              <stop offset="100%" stop-color="#FFC107" />
+                          </linearGradient>
+                          <radialGradient id="cyber-core-btn" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stop-color="#263238" /><stop offset="70%" stop-color="#11151C" />
+                              <stop offset="100%" stop-color="#000000" />
+                          </radialGradient>
+                          <filter id="inner-shadow-btn" x="-20%" y="-20%" width="140%" height="140%">
+                              <feOffset dx="0" dy="15"/><feGaussianBlur stdDeviation="15" result="offset-blur"/>
+                              <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+                              <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
+                              <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+                              <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+                          </filter>
+                          <filter id="neon-glow-btn" x="-50%" y="-50%" width="200%" height="200%">
+                              <feGaussianBlur stdDeviation="4" result="blur" />
+                              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                          </filter>
+                      </defs>
+
+                      <circle cx="200" cy="210" r="185" fill="#000" opacity="0.6" filter="blur(10px)" />
+                      <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-dark-btn)" stroke-width="24" stroke-dasharray="8 6" />
+                      <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-bright-btn)" stroke-width="12" />
+                      <circle cx="200" cy="200" r="179" fill="url(#gold-dark-btn)" />
+                      <circle cx="200" cy="200" r="170" fill="url(#gold-bright-btn)" />
+                      <circle cx="200" cy="200" r="150" fill="url(#cyber-core-btn)" filter="url(#inner-shadow-btn)" />
+                      <circle cx="200" cy="200" r="150" fill="none" stroke="#FFA000" stroke-width="2" opacity="0.5" />
+                      
+                      <g class="origin-center animate-[spin_15s_linear_infinite]">
+                          <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.4" />
+                          <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="3" stroke-dasharray="40 120" opacity="0.8" filter="url(#neon-glow-btn)" />
+                      </g>
+                      <g class="origin-center animate-[spin_20s_linear_infinite_reverse]">
+                          <path d="M 200 65 L 205 75 L 215 75 L 210 85 L 215 95 L 205 95 L 200 105 L 195 95 L 185 95 L 190 85 L 185 75 L 195 75 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                          <path d="M 200 295 L 205 305 L 215 305 L 210 315 L 215 325 L 205 325 L 200 335 L 195 325 L 185 325 L 190 315 L 185 305 L 195 305 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                          <path d="M 65 200 L 75 195 L 75 185 L 85 190 L 95 185 L 95 195 L 105 200 L 95 205 L 95 215 L 85 210 L 75 215 L 75 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                          <path d="M 295 200 L 305 195 L 305 185 L 315 190 L 325 185 L 325 195 L 335 200 L 325 205 L 325 215 L 315 210 L 305 215 L 305 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
+                      </g>
+
+                      <path d="M 110 110 L 140 140 L 140 260 L 110 290 M 290 110 L 260 140 L 260 260 L 290 290" fill="none" stroke="#FF8F00" stroke-width="2" opacity="0.3" />
+                      <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="url(#gold-dark-btn)" opacity="0.4" />
+                      <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="none" stroke="#FFC107" stroke-width="3" filter="url(#neon-glow-btn)" />
+
+                      <text x="200" y="215" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="#000" text-anchor="middle" letter-spacing="2">LSPK</text>
+                      <text x="200" y="210" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="url(#gold-bright-btn)" text-anchor="middle" letter-spacing="2" filter="url(#neon-glow-btn)">LSPK</text>
+                      <text x="200" y="255" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFCA28" text-anchor="middle" letter-spacing="10" opacity="0.8">TOKEN</text>
+                      
+                      <path d="M 60 200 A 140 140 0 0 1 340 200" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.1" filter="blur(2px)"/>
+                      <path d="M 90 120 A 130 130 0 0 1 200 70" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.4" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Энергия -->
+              <div class="w-full max-w-[300px] mb-4">
+                  <div class="flex justify-between items-center mb-1.5 px-1">
+                      <span class="text-[#848E9C] text-[10px] font-bold uppercase flex items-center gap-1"><i data-lucide="zap" width="12" height="12" class="text-[#FCD535]"></i> Энергия</span>
+                      <span class="text-white font-bold text-[10px]" id="ui-energy-text">200 / 200</span>
+                  </div>
+                  <div class="w-full h-2 bg-[#181A20] border border-[#2B3139] rounded-full overflow-hidden">
+                      <div id="ui-energy-bar" class="h-full bg-gradient-to-r from-[#FEE140] to-[#F3BA2F]" style="width: 100%;"></div>
+                  </div>
+              </div>
+
+              <div class="w-full max-w-[300px] bg-[#181A20] border border-[#2B3139] rounded-2xl p-4 text-center">
+                <div class="flex justify-center gap-1.5 text-[#FCD535] font-bold mb-1 items-center">
+                    <i data-lucide="bot" width="16" height="16" fill="currentColor"></i>
+                    <span class="text-xs tracking-widest uppercase" id="ui-auto-status">Ожидание команд...</span>
+                </div>
+                <div class="text-[10px] text-[#848E9C]">Работает только офлайн (макс: <span id="ui-offline-hours">12</span> ч.)</div>
+              </div>
+            </div>
+
+            <!-- Вкладка: КОШЕЛЕК -->
+            <div id="tab-wallet" class="hidden flex-1 flex flex-col px-4 pt-6 pb-4">
+                
+                <!-- Экран регистрации -->
+                <div id="wallet-register" class="flex flex-col items-center justify-center h-full text-center">
+                  <div class="w-20 h-20 bg-[#FCD535]/10 rounded-full flex items-center justify-center mb-6">
+                      <i data-lucide="wallet" class="text-[#FCD535]" width="40" height="40"></i>
+                  </div>
+                  <h2 class="text-2xl font-black text-white mb-2">Открыть кошелёк</h2>
+                  <p class="text-[#848E9C] text-sm mb-6 px-4">Пройдите регистрацию и получите 200 ₽ и 50 LSPK на счет!</p>
+                  <form id="register-form" class="w-full max-w-[300px] space-y-3">
+                    <input id="reg-fname" required placeholder="Имя" class="w-full bg-[#181A20] border border-[#2B3139] rounded-xl p-4 text-white outline-none focus:border-[#FCD535]" />
+                    <input id="reg-lname" required placeholder="Фамилия" class="w-full bg-[#181A20] border border-[#2B3139] rounded-xl p-4 text-white outline-none focus:border-[#FCD535]" />
+                    <input id="reg-uname" required placeholder="уникальный_ник" class="w-full bg-[#181A20] border border-[#2B3139] rounded-xl p-4 text-white outline-none focus:border-[#FCD535]" />
+                    <p id="reg-error" class="text-[#F6465D] text-xs font-bold hidden"></p>
+                    <button type="submit" id="reg-btn" class="w-full bg-[#FCD535] text-black font-black py-4 rounded-xl active:scale-95 transition-transform">Получить бонус</button>
+                  </form>
+                </div>
+
+                <!-- Основной кошелек -->
+                <div id="wallet-main" class="hidden space-y-4 pb-10">
+                  <div class="flex items-center gap-3 bg-[#181A20] p-4 rounded-2xl border border-[#2B3139]">
+                    <div id="ui-wallet-avatar" class="w-12 h-12 bg-gradient-to-br from-[#FEE140] to-[#F3BA2F] rounded-full flex items-center justify-center font-black text-black text-lg"></div>
+                    <div>
+                        <p class="text-white font-bold" id="ui-wallet-name"></p>
+                        <p class="text-[#848E9C] text-xs font-mono" id="ui-wallet-uname"></p>
+                    </div>
+                  </div>
+
+                  <div class="bg-gradient-to-br from-[#1e232d] to-[#181A20] p-6 rounded-3xl border border-[#2B3139] shadow-xl">
+                    <span class="text-[#848E9C] text-[10px] uppercase font-black tracking-widest">Основной баланс</span>
+                    <div class="text-4xl font-black text-white font-mono mt-1 mb-6"><span id="ui-rub-balance">0</span> <span class="text-xl text-[#848E9C]">₽</span></div>
+                    <button id="btn-transfer-rub" class="w-full bg-[#2B3139] py-3.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
+                        <i data-lucide="send" class="text-[#0ECB81]" width="16" height="16"></i> Перевод (P2P)
+                    </button>
+                  </div>
+
+                  <div class="bg-[#181A20] p-6 rounded-3xl border border-[#2B3139] shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                      <span class="text-[#848E9C] text-[10px] uppercase font-black tracking-widest">LSPK Токены</span>
+                      <span class="bg-[#2B3139]/50 text-[#848E9C] text-[10px] px-2 py-1 rounded font-bold">Ожидает листинга</span>
+                    </div>
+                    <div class="flex gap-2">
+                       <button class="btn-fake-lspk flex-1 bg-[#2B3139] py-3 rounded-xl text-xs font-black active:scale-95 transition-all text-[#848E9C]" onclick="window.appAPI.fakeLspkAction()">Перевод</button>
+                       <button class="btn-fake-lspk flex-1 bg-[#0ECB81]/10 border border-[#0ECB81]/20 py-3 rounded-xl text-xs font-black active:scale-95 transition-all text-[#0ECB81]/80" onclick="window.appAPI.fakeLspkAction()">Купить</button>
+                       <button class="btn-fake-lspk flex-1 bg-[#F6465D]/10 border border-[#F6465D]/20 py-3 rounded-xl text-xs font-black active:scale-95 transition-all text-[#F6465D]/80" onclick="window.appAPI.fakeLspkAction()">Продать</button>
+                    </div>
+                  </div>
+
+                  <div class="space-y-3 pt-2">
+                    <h3 class="text-[#848E9C] text-[10px] uppercase font-black tracking-[0.2em] ml-1">Мои Активы</h3>
+                    <div id="wallet-portfolio-list">
+                        <!-- Динамический список акций -->
+                    </div>
+                    <div id="wallet-portfolio-empty" class="hidden bg-[#181A20]/50 border border-dashed border-[#2B3139] rounded-3xl p-8 text-center">
+                         <p class="text-[#848E9C] text-xs">У вас пока нет купленных акций</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Экран перевода -->
+                <div id="wallet-transfer" class="hidden flex flex-col h-full">
+                  <div class="flex items-center mb-6">
+                      <button id="btn-back-to-wallet" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
+                      <h2 class="text-lg font-bold text-white">Перевод актива</h2>
+                  </div>
+                  <div class="bg-[#181A20] border border-[#2B3139] rounded-2xl p-5 space-y-4">
+                    <p class="text-[10px] text-[#848E9C] uppercase font-bold ml-1">Что отправляем?</p>
+                    
+                    <div id="transfer-currency-selector" class="flex flex-wrap gap-2 mb-4">
+                       <!-- Кнопки выбора валюты генерируются JS -->
+                    </div>
+                    
+                    <input id="transfer-target" placeholder="username друга" class="w-full bg-[#0B0E14] border border-[#2B3139] rounded-xl p-4 text-white outline-none" />
+                    <input id="transfer-amount" type="number" placeholder="Количество" class="w-full bg-[#0B0E14] border border-[#2B3139] rounded-xl p-4 text-white outline-none" />
+                    
+                    <p id="transfer-error" class="hidden text-[#F6465D] text-xs font-bold"></p>
+                    
+                    <button id="btn-submit-transfer" class="w-full bg-[#0ECB81] text-white font-black py-4 rounded-xl flex justify-center items-center gap-2 shadow-lg shadow-[#0ECB81]/10 active:scale-[0.98] transition-all">
+                      <i data-lucide="send" width="20" height="20"></i> <span id="transfer-btn-text">Отправить</span>
+                    </button>
+                  </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: БИРЖА -->
+            <div id="tab-exchange" class="hidden flex-1 flex flex-col px-4 pb-4">
+                
+                <!-- Категории -->
+                <div id="exchange-categories" class="space-y-3 mt-4">
+                      <h2 class="text-lg font-bold text-white mb-2 ml-1 uppercase tracking-widest text-[10px] text-[#848E9C]">Биржевые Рынки</h2>
+                      <button data-cat="stocks" class="btn-category w-full bg-[#181A20] p-5 rounded-2xl border border-[#2B3139] flex items-center gap-4 active:scale-95 shadow-lg">
+                         <div class="w-12 h-12 rounded-full bg-[#0ECB81]/10 flex items-center justify-center"><i data-lucide="building-2" class="text-[#0ECB81]"></i></div>
+                         <div class="text-left"><p class="text-white font-bold text-lg">Акции</p><p class="text-[#848E9C] text-xs">Рынок ценных бумаг колледжа</p></div>
+                         <i data-lucide="chevron-right" class="ml-auto text-[#848E9C]"></i>
+                      </button>
+                      <button data-cat="coins" class="btn-category w-full bg-[#181A20] p-5 rounded-2xl border border-[#2B3139] flex items-center gap-4 active:scale-95 shadow-lg">
+                         <div class="w-12 h-12 rounded-full bg-[#FCD535]/10 flex items-center justify-center"><i data-lucide="coins" class="text-[#FCD535]"></i></div>
+                         <div class="text-left"><p class="text-white font-bold text-lg">Койны</p><p class="text-[#848E9C] text-xs">LSPK и внешние активы</p></div>
+                         <i data-lucide="chevron-right" class="ml-auto text-[#848E9C]"></i>
+                      </button>
+                </div>
+
+                <!-- Список активов -->
+                <div id="exchange-list" class="hidden">
+                    <button id="btn-back-categories" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
+                    <div id="exchange-assets-container" class="space-y-2">
+                       <!-- Список генерируется JS -->
+                    </div>
+                </div>
+
+                <!-- Терминал -->
+                <div id="exchange-terminal" class="hidden flex flex-col h-full">
+                     <div class="flex items-center justify-between mb-4">
+                        <button id="btn-back-list" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
+                        <div class="text-center">
+                            <h2 id="terminal-pair" class="text-lg font-black text-white leading-none uppercase tracking-tighter"></h2>
+                            <p class="text-[9px] text-[#0ECB81] uppercase font-black tracking-widest flex items-center gap-1 justify-center"><i data-lucide="activity" width="8" height="8"></i> Market Real-time</p>
+                        </div>
+                        <div class="w-10"></div>
+                     </div>
+
+                     <!-- График -->
+                     <div class="w-full h-40 bg-[#161a25] rounded-3xl mb-4 relative overflow-hidden border border-white/5 shadow-inner">
+                        <div id="terminal-chart-container" class="w-full h-full"></div>
+                        <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-white border border-white/10 flex items-center gap-2">
+                           <span id="terminal-price-dot" class="w-1.5 h-1.5 rounded-full animate-pulse bg-[#0ECB81]"></span>
+                           <span id="terminal-current-price">0 ₽</span>
+                        </div>
+                     </div>
+
+                     <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex flex-col flex-1 shadow-2xl">
+                        <!-- Переключатель Buy/Sell -->
+                        <div class="flex bg-[#0B0E14] p-1 rounded-xl mb-6 border border-[#2B3139]">
+                           <button id="btn-mode-buy" class="flex-1 py-2.5 rounded-lg font-black text-sm transition-all bg-[#0ECB81] text-white shadow-lg">КУПИТЬ</button>
+                           <button id="btn-mode-sell" class="flex-1 py-2.5 rounded-lg font-black text-sm transition-all text-[#848E9C]">ПРОДАТЬ</button>
+                        </div>
+                        
+                        <div class="flex justify-between items-end text-[10px] text-[#848E9C] mb-3 px-1 font-bold uppercase tracking-tight">
+                           <div class="flex flex-col">
+                               <span>Доступно</span>
+                               <span id="terminal-available" class="text-white font-mono text-sm"></span>
+                           </div>
+                           <button id="btn-max-trade" class="bg-[#2B3139] text-[#FCD535] px-2 py-1 rounded-md active:scale-95">МАКС</button>
+                        </div>
+
+                        <div class="relative mb-6">
+                           <input id="trade-amount" type="number" placeholder="0" class="w-full bg-[#0B0E14] border border-[#2B3139] rounded-2xl p-5 text-2xl font-black text-white outline-none focus:border-[#FCD535]" />
+                           <span id="terminal-ticker-label" class="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-[#848E9C]"></span>
+                        </div>
+
+                        <div class="mt-auto border-t border-white/5 pt-5 mb-5 flex justify-between items-center">
+                           <span class="text-[#848E9C] text-xs font-bold">ИТОГО</span>
+                           <span class="text-2xl font-black text-white"><span id="terminal-total-cost">0</span> <span class="text-sm text-[#848E9C]">₽</span></span>
+                        </div>
+                        
+                        <button id="btn-confirm-trade" class="w-full py-4.5 rounded-2xl font-black text-lg active:scale-[0.98] transition-all shadow-xl text-white bg-[#0ECB81] shadow-[#0ECB81]/10">
+                           ПОДТВЕРДИТЬ ПОКУПКУ
+                        </button>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: БУСТЫ -->
+            <div id="tab-boosts" class="hidden flex-1 flex flex-col px-4 pb-4">
+               <div class="mt-4 space-y-4">
+                  <h2 class="text-[#848E9C] text-[10px] font-black uppercase tracking-[0.2em] ml-1 mb-2 text-center">Прокачка мощностей</h2>
+                  
+                  <!-- Буст 1: Мультитап -->
+                  <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
+                    <div class="flex items-center gap-4">
+                      <div class="w-14 h-14 rounded-2xl bg-[#FCD535]/10 flex items-center justify-center border border-[#FCD535]/20">
+                          <i data-lucide="mouse-pointer-click" class="text-[#FCD535]" width="28" height="28"></i>
+                      </div>
+                      <div class="flex flex-col">
+                        <h3 class="font-black text-white text-sm uppercase">Мультитап</h3>
+                        <p class="text-[#848E9C] text-[10px] mt-0.5 uppercase">Сила клика: <span class="text-[#0ECB81] font-bold">+1 LSPK</span></p>
+                      </div>
+                    </div>
+                    <button id="btn-upgrade-click" class="bg-[#FCD535] text-black px-5 py-2.5 rounded-xl font-black text-[11px] active:scale-95 transition-all flex flex-col items-center shadow-lg shadow-[#FCD535]/10 disabled:opacity-30 disabled:active:scale-100">
+                      <span id="ui-cost-click"></span><span class="text-[8px] opacity-60">LSPK</span>
+                    </button>
+                  </div>
+                  
+                  <!-- Буст 2: Автокликер -->
+                  <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
+                    <div class="flex items-center gap-4">
+                      <div class="w-14 h-14 rounded-2xl bg-[#2962FF]/10 flex items-center justify-center border border-[#2962FF]/20">
+                          <i data-lucide="bot" class="text-[#2962FF]" width="28" height="28"></i>
+                      </div>
+                      <div class="flex flex-col">
+                        <h3 class="font-black text-white text-sm uppercase">Автокликер</h3>
+                        <p class="text-[#848E9C] text-[10px] mt-0.5 uppercase">Авто-добыча: <span class="text-white font-bold">+1 / сек.</span></p>
+                      </div>
+                    </div>
+                    <button id="btn-upgrade-auto" class="bg-[#FCD535] text-black px-5 py-2.5 rounded-xl font-black text-[11px] active:scale-95 transition-all flex flex-col items-center shadow-lg shadow-[#FCD535]/10 disabled:opacity-30 disabled:active:scale-100">
+                      <span id="ui-cost-auto"></span><span class="text-[8px] opacity-60">LSPK</span>
+                    </button>
+                  </div>
+               </div>
+            </div>
+
+        </main>
+
+        <!-- Нижняя навигация -->
+        <nav class="bg-[#181A20] border-t border-white/5 flex justify-between px-6 pt-3 pb-8 shrink-0 rounded-t-[2.5rem] shadow-2xl relative z-50">
+          <button data-tab="mine" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-white">
+              <i data-lucide="coins" class="icon text-[#FCD535]" width="24" height="24"></i>
+              <span class="text-[9px] font-black uppercase tracking-widest">Кликер</span>
+          </button>
+          <button data-tab="exchange" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#848E9C] opacity-50">
+              <i data-lucide="bar-chart-3" class="icon" width="24" height="24"></i>
+              <span class="text-[9px] font-black uppercase tracking-widest">Биржа</span>
+          </button>
+          <button data-tab="wallet" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#848E9C] opacity-50">
+              <i data-lucide="wallet" class="icon" width="24" height="24"></i>
+              <span class="text-[9px] font-black uppercase tracking-widest">Кошелёк</span>
+          </button>
+          <button data-tab="boosts" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#848E9C] opacity-50">
+              <i data-lucide="zap" class="icon" width="24" height="24"></i>
+              <span class="text-[9px] font-black uppercase tracking-widest">Бусты</span>
+          </button>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        lucide.createIcons();
+
+        // === НАСТРОЙКИ FIREBASE ===
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBy2X53f_J97ofALfTQALq1TWXoFSZX2PE",
+            authDomain: "lspk-tocen.firebaseapp.com",
+            projectId: "lspk-tocen",
+            storageBucket: "lspk-tocen.firebasestorage.app",
+            messagingSenderId: "582952786678",
+            appId: "1:582952786678:web:8331700cbf62bac65d2ad7"
+        };
+
+        const hasFirebase = !!firebaseConfig.apiKey;
+        let app, auth, db;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        if (hasFirebase) {
+            try { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } 
+            catch(e) { console.error("Ошибка Firebase:", e); }
+        }
+
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        if (tg) {
+            tg.ready(); tg.expand(); tg.disableVerticalSwipes(); 
+            tg.setHeaderColor('#0B0E14'); tg.setBackgroundColor('#0B0E14');
+        }
+        const tgUser = tg?.initDataUnsafe?.user;
+
+        // === ИГРОВОЕ СОСТОЯНИЕ ===
+        let state = {
+            user: null,
+            effectiveUserId: null,
+            balance: 0,
+            clickPower: 1,      // Сила тапа (Мультитап)
+            autoRate: 0,        // Добыча автокликера в секунду
+            energy: 200,        // Текущая энергия
+            maxEnergy: 200,     // Максимальная энергия
+            maxOfflineHours: 12, // Автокликер работает 12 часов офлайн
+            portfolio: { bufx: 0, tepx: 0, kafx: 0 },
+            stockPrices: { bufx: 200, tepx: 250, kafx: 165 },
+            priceHistory: { bufx: Array(20).fill(200), tepx: Array(20).fill(250), kafx: Array(20).fill(165) },
+            walletInfo: { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 },
+            processedTransfers: []
+        };
+
+        let uiState = { activeTab: 'mine', walletView: 'main', exchangeView: 'categories', tradeMode: 'buy', selectedStock: null, transferCurrency: 'rub' };
+
+        const stocksList = [
+            { id: 'bufx', name: 'Буфет', ticker: 'BUFX', price: 200, icon: 'store', color: '#F3BA2F' },
+            { id: 'tepx', name: 'Теплица', ticker: 'TEPX', price: 250, icon: 'leaf', color: '#0ECB81' },
+            { id: 'kafx', name: 'Кафе', ticker: 'KAFX', price: 165, icon: 'coffee', color: '#2962FF' },
+        ];
+        // Для монет на бирже используем обычные иконки, чтобы не подгружать картинки
+        const coinsList = [
+            { id: 'lspk', name: 'LSPK Token', ticker: 'LSPK', price: null, status: 'не объявлена', icon: 'gem', color: '#FCD535' }
+        ];
+
+        function showNotification(msg) {
+            const toast = document.getElementById('notification-toast');
+            document.getElementById('notification-text').innerText = msg;
+            toast.classList.remove('hidden', 'opacity-0', 'translate-y-[-20px]');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-20px]');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3500);
+        }
+
+        function formatNum(num) { return Math.floor(num).toLocaleString('ru-RU'); }
+
+        // === ОБНОВЛЕНИЕ UI ===
+        function updateAllUI() {
+            // Баланс
+            const balanceStr = Math.floor(state.balance).toLocaleString('ru-RU');
+            document.getElementById('ui-main-balance').innerText = balanceStr;
+            
+            // Кликер, Энергия и Автокликер
+            document.getElementById('ui-click-power').innerText = state.clickPower;
+            document.getElementById('ui-auto-rate').innerText = state.autoRate;
+            document.getElementById('ui-offline-hours').innerText = state.maxOfflineHours;
+            
+            // Энергия
+            document.getElementById('ui-energy-text').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
+            document.getElementById('ui-energy-bar').style.width = `${(state.energy / state.maxEnergy) * 100}%`;
+
+            if(state.autoRate > 0) {
+                document.getElementById('ui-auto-status').innerText = "Автокликер готов к работе";
+                document.getElementById('ui-auto-status').classList.replace("text-[#848E9C]", "text-[#0ECB81]");
+            }
+
+            // Стоимость бустов
+            const clickCost = Math.floor(50 * Math.pow(1.5, state.clickPower - 1));
+            const autoCost = Math.floor(100 * Math.pow(1.5, state.autoRate));
+            
+            const btnUpClick = document.getElementById('btn-upgrade-click');
+            document.getElementById('ui-cost-click').innerText = formatNum(clickCost);
+            btnUpClick.disabled = state.balance < clickCost;
+
+            const btnUpAuto = document.getElementById('btn-upgrade-auto');
+            document.getElementById('ui-cost-auto').innerText = formatNum(autoCost);
+            btnUpAuto.disabled = state.balance < autoCost;
+
+            renderWallet(); renderTerminal(); renderExchangeList();
+        }
+
+        function renderWallet() {
+            const elReg = document.getElementById('wallet-register');
+            const elMain = document.getElementById('wallet-main');
+            const elTrans = document.getElementById('wallet-transfer');
+            
+            elReg.classList.add('hidden'); elMain.classList.add('hidden'); elTrans.classList.add('hidden');
+
+            if (!state.walletInfo.registered) {
+                elReg.classList.remove('hidden');
+                if(tgUser) {
+                    document.getElementById('reg-fname').value = tgUser.first_name || '';
+                    document.getElementById('reg-lname').value = tgUser.last_name || '';
+                    document.getElementById('reg-uname').value = tgUser.username || '';
+                }
+            } else if (uiState.walletView === 'main') {
+                elMain.classList.remove('hidden');
+                const wInfo = state.walletInfo;
+                document.getElementById('ui-wallet-avatar').innerText = (wInfo.firstName[0] || '') + (wInfo.lastName[0] || '');
+                document.getElementById('ui-wallet-name').innerText = `${wInfo.firstName} ${wInfo.lastName}`;
+                document.getElementById('ui-wallet-uname').innerText = `@${wInfo.username}`;
+                document.getElementById('ui-rub-balance').innerText = formatNum(wInfo.rubBalance);
+
+                const portfolioList = document.getElementById('wallet-portfolio-list');
+                const portfolioEmpty = document.getElementById('wallet-portfolio-empty');
+                portfolioList.innerHTML = '';
+                
+                let hasAssets = false;
+                stocksList.forEach(stock => {
+                    if (state.portfolio[stock.id] > 0) {
+                        hasAssets = true;
+                        const currentPrice = state.stockPrices[stock.id] || stock.price;
+                        const totalVal = state.portfolio[stock.id] * currentPrice;
+                        
+                        portfolioList.innerHTML += `
+                        <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-4 shadow-lg overflow-hidden relative mb-2">
+                           <div class="flex items-center justify-between mb-4">
+                              <div class="flex items-center gap-3">
+                                 <div class="w-10 h-10 bg-[#2B3139] rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="${stock.icon}" width="20" height="20" style="color: ${stock.color}"></i>
+                                 </div>
+                                 <div>
+                                    <p class="text-white font-black text-sm uppercase">${stock.ticker}</p>
+                                    <p class="text-[#848E9C] text-[10px]">${stock.name}</p>
+                                 </div>
+                              </div>
+                              <div class="text-right">
+                                 <p class="text-white font-black text-lg">${state.portfolio[stock.id]} <span class="text-[10px] text-[#848E9C]">шт</span></p>
+                                 <p class="text-[#0ECB81] text-[10px] font-mono">≈ ${formatNum(totalVal)} ₽</p>
+                              </div>
+                           </div>
+                           <div class="flex gap-2">
+                              <button onclick="window.appAPI.goToExchange('${stock.id}', 'buy')" class="flex-1 bg-[#0ECB81]/10 text-[#0ECB81] border border-[#0ECB81]/20 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-tighter">Купить</button>
+                              <button onclick="window.appAPI.goToExchange('${stock.id}', 'sell')" class="flex-1 bg-[#F6465D]/10 text-[#F6465D] border border-[#F6465D]/20 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-tighter">Продать</button>
+                              <button onclick="window.appAPI.openTransfer('${stock.id}')" class="p-2.5 bg-[#2B3139] text-white rounded-xl active:scale-95"><i data-lucide="arrow-right-left" width="16" height="16"></i></button>
+                           </div>
+                        </div>`;
+                    }
+                });
+                portfolioEmpty.classList.toggle('hidden', hasAssets);
+                lucide.createIcons();
+            } else if (uiState.walletView === 'transfer') {
+                elTrans.classList.remove('hidden');
+                const curSelector = document.getElementById('transfer-currency-selector');
+                curSelector.innerHTML = `
+                    <button onclick="window.appAPI.setTransferCur('rub')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all border ${uiState.transferCurrency === 'rub' ? 'bg-[#2B3139] text-white border-white/20' : 'bg-transparent text-[#848E9C] border-white/5'}">Рубли ₽</button>
+                    <button onclick="window.appAPI.fakeLspkAction()" class="px-4 py-2 rounded-lg text-xs font-bold transition-all border bg-transparent text-[#848E9C] border-white/5 opacity-50">LSPK</button>
+                `;
+                stocksList.forEach(s => {
+                    if (state.portfolio[s.id] > 0) {
+                        curSelector.innerHTML += `<button onclick="window.appAPI.setTransferCur('${s.id}')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all border ${uiState.transferCurrency === s.id ? 'bg-[#2B3139] text-white border-white/20' : 'bg-transparent text-[#848E9C] border-white/5'}">${s.ticker}</button>`;
+                    }
+                });
+            }
+        }
+
+        function renderExchangeList() {
+            if(uiState.exchangeView !== 'list') return;
+            const container = document.getElementById('exchange-assets-container');
+            container.innerHTML = '';
+            
+            const list = uiState.exchangeCategory === 'stocks' ? stocksList : coinsList;
+            list.forEach(stock => {
+                const currentPrice = state.stockPrices[stock.id] || stock.price;
+                const portfCount = stock.id === 'lspk' ? Math.floor(state.balance) : (state.portfolio[stock.id] || 0);
+                
+                let iconHtml = '';
+                if (stock.id === 'lspk') {
+                    iconHtml = `
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center p-0.5 relative">
+                        <div class="absolute inset-0 bg-[#FCD535] opacity-20 blur-md rounded-full"></div>
+                        <svg viewBox="0 0 400 400" class="w-full h-full relative z-10 drop-shadow-md">
+                            <defs>
+                                <linearGradient id="gold-bright-list" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#FFF8E1" /><stop offset="25%" stop-color="#FFE082" />
+                                    <stop offset="50%" stop-color="#FFB300" /><stop offset="75%" stop-color="#FF8F00" />
+                                    <stop offset="100%" stop-color="#E65100" />
+                                </linearGradient>
+                                <linearGradient id="gold-dark-list" x1="100%" y1="100%" x2="0%" y2="0%">
+                                    <stop offset="0%" stop-color="#3E2723" /><stop offset="50%" stop-color="#FF6F00" />
+                                    <stop offset="100%" stop-color="#FFC107" />
+                                </linearGradient>
+                                <radialGradient id="cyber-core-list" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#263238" /><stop offset="70%" stop-color="#11151C" />
+                                    <stop offset="100%" stop-color="#000000" />
+                                </radialGradient>
+                            </defs>
+                            <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-dark-list)" stroke-width="24" stroke-dasharray="8 6" />
+                            <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-bright-list)" stroke-width="12" />
+                            <circle cx="200" cy="200" r="179" fill="url(#gold-dark-list)" />
+                            <circle cx="200" cy="200" r="170" fill="url(#gold-bright-list)" />
+                            <circle cx="200" cy="200" r="150" fill="url(#cyber-core-list)" />
+                            <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="url(#gold-dark-list)" opacity="0.4" />
+                            <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="none" stroke="#FFC107" stroke-width="3" />
+                            <text x="200" y="225" font-size="90" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="#000" text-anchor="middle" letter-spacing="2">LSPK</text>
+                            <text x="200" y="220" font-size="90" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="url(#gold-bright-list)" text-anchor="middle" letter-spacing="2">LSPK</text>
+                        </svg>
+                    </div>`;
+                } else {
+                    iconHtml = `<div class="w-10 h-10 bg-[#2B3139] rounded-full flex items-center justify-center"><i data-lucide="${stock.icon}" width="18" height="18" style="color:${stock.color}"></i></div>`;
+                }
+
+                container.innerHTML += `
+                    <div onclick="window.appAPI.openTerminal('${stock.id}')" class="bg-[#181A20] p-4 rounded-2xl border border-[#2B3139] flex items-center justify-between cursor-pointer active:bg-[#2B3139]/30 transition-colors mb-2">
+                       <div class="flex items-center gap-3">
+                          ${iconHtml}
+                          <div><p class="text-white font-bold">${stock.ticker}</p><p class="text-[#848E9C] text-[10px]">${stock.name}</p></div>
+                       </div>
+                       <div class="text-right">
+                          <p class="text-white font-mono font-bold text-sm">${currentPrice ? formatNum(currentPrice) + ' ₽' : 'не объявлена'}</p>
+                          <p class="text-[10px] text-[#848E9C]">Портфель: ${formatNum(portfCount)}</p>
+                       </div>
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function renderTerminal() {
+            if(uiState.exchangeView !== 'terminal' || !uiState.selectedStock) return;
+            const stock = uiState.selectedStock;
+            const currentPrice = state.stockPrices[stock.id] || stock.price || 0;
+            const isBuy = uiState.tradeMode === 'buy';
+
+            document.getElementById('terminal-pair').innerText = `${stock.ticker}/RUB`;
+            document.getElementById('terminal-price-dot').className = `w-1.5 h-1.5 rounded-full animate-pulse ${isBuy ? 'bg-[#0ECB81]' : 'bg-[#F6465D]'}`;
+            document.getElementById('terminal-current-price').innerText = `${currentPrice} ₽`;
+            
+            const btnBuy = document.getElementById('btn-mode-buy');
+            const btnSell = document.getElementById('btn-mode-sell');
+            if(isBuy) {
+                btnBuy.className = "flex-1 py-2.5 rounded-lg font-black text-sm transition-all bg-[#0ECB81] text-white shadow-lg";
+                btnSell.className = "flex-1 py-2.5 rounded-lg font-black text-sm transition-all text-[#848E9C]";
+            } else {
+                btnBuy.className = "flex-1 py-2.5 rounded-lg font-black text-sm transition-all text-[#848E9C]";
+                btnSell.className = "flex-1 py-2.5 rounded-lg font-black text-sm transition-all bg-[#F6465D] text-white shadow-lg";
+            }
+
+            document.getElementById('terminal-available').innerText = isBuy ? `${formatNum(state.walletInfo.rubBalance)} ₽` : `${state.portfolio[stock.id] || 0} ${stock.ticker}`;
+            document.getElementById('btn-max-trade').style.display = 'block';
+
+            const amount = Math.floor(parseFloat(document.getElementById('trade-amount').value || 0));
+            document.getElementById('terminal-ticker-label').innerText = stock.ticker;
+            document.getElementById('terminal-total-cost').innerText = formatNum(amount * currentPrice);
+
+            const btnConfirm = document.getElementById('btn-confirm-trade');
+            btnConfirm.innerText = isBuy ? 'ПОДТВЕРДИТЬ ПОКУПКУ' : 'ПОДТВЕРДИТЬ ПРОДАЖУ';
+            btnConfirm.className = `w-full py-4.5 rounded-2xl font-black text-lg active:scale-[0.98] transition-all shadow-xl text-white ${isBuy ? 'bg-[#0ECB81] shadow-[#0ECB81]/10' : 'bg-[#F6465D] shadow-[#F6465D]/10'}`;
+
+            const chartData = state.priceHistory[stock.id] || Array(20).fill(currentPrice);
+            const color = isBuy ? '#0ECB81' : '#F6465D';
+            const min = Math.min(...chartData) * 0.99;
+            const max = Math.max(...chartData) * 1.01;
+            const range = max - min || 1;
+            const points = chartData.map((val, i) => `${(i / 19) * 340},${160 - ((val - min) / range) * 160}`).join(' ');
+
+            document.getElementById('terminal-chart-container').innerHTML = `
+            <svg class="w-full h-full" viewBox="0 0 340 160" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="grad-chart" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="${color}" stop-opacity="0.3" /><stop offset="100%" stop-color="${color}" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M 0,160 L ${points} L 340,160 Z" fill="url(#grad-chart)" />
+              <polyline fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
+            </svg>`;
+        }
+
+        function switchTab(tabId) {
+            uiState.activeTab = tabId;
+            document.getElementById('tab-mine').classList.add('hidden');
+            document.getElementById('tab-wallet').classList.add('hidden');
+            document.getElementById('tab-exchange').classList.add('hidden');
+            document.getElementById('tab-boosts').classList.add('hidden');
+            
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            const balHeader = document.getElementById('global-balance-header');
+            if((tabId === 'mine') && !uiState.selectedStock) balHeader.classList.remove('hidden');
+            else balHeader.classList.add('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isActive = btn.dataset.tab === tabId;
+                btn.className = `nav-btn flex flex-col items-center gap-1.5 transition-all ${isActive ? 'text-white' : 'text-[#848E9C] opacity-50'}`;
+                const icon = btn.querySelector('.icon');
+                if(icon) {
+                    if (isActive) icon.classList.add('text-[#FCD535]');
+                    else icon.classList.remove('text-[#FCD535]');
+                }
+            });
+
+            if(tabId === 'exchange') {
+                uiState.exchangeView = 'categories'; uiState.exchangeCategory = null; uiState.selectedStock = null;
+                switchExchangeView('categories');
+            }
+            if(tabId === 'wallet') { uiState.walletView = 'main'; renderWallet(); }
+            updateAllUI();
+        }
+
+        function switchExchangeView(view) {
+            uiState.exchangeView = view;
+            document.getElementById('exchange-categories').classList.add('hidden');
+            document.getElementById('exchange-list').classList.add('hidden');
+            document.getElementById('exchange-terminal').classList.add('hidden');
+            document.getElementById(`exchange-${view}`).classList.remove('hidden');
+            document.getElementById('global-balance-header').classList.add('hidden');
+            if(view === 'list') renderExchangeList();
+            if(view === 'terminal') renderTerminal();
+        }
+
+        // === ИНИЦИАЛИЗАЦИЯ И FIREBASE ===
+        async function initApp() {
+            let tempUserId = tgUser?.id?.toString() || 'local_dev_user_' + Math.floor(Math.random() * 1000);
+
+            // Общая функция загрузки данных в стейт
+            const applyLoadedData = (data) => {
+                state.clickPower = data.clickPower || 1;
+                state.autoRate = data.autoRate || 0;
+                state.energy = data.energy !== undefined ? data.energy : 200;
+                state.maxEnergy = data.maxEnergy || 200;
+                state.maxOfflineHours = data.maxOfflineHours || 12;
+                state.portfolio = data.portfolio || { bufx: 0, tepx: 0, kafx: 0 };
+                state.stockPrices = data.stockPrices || { bufx: 200, tepx: 250, kafx: 165 };
+                if(data.priceHistory) state.priceHistory = data.priceHistory;
+                state.walletInfo = data.walletInfo || { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 };
+                state.processedTransfers = data.processedTransfers || [];
+                
+                const now = Date.now();
+                const offlineSeconds = Math.floor((now - (data.lastTime || now)) / 1000);
+                const maxOffSec = state.maxOfflineHours * 3600;
+                
+                // Подсчет автокликера в оффлайне (теперь rate это монеты в секунду)
+                const earnedOffline = Math.min(offlineSeconds, maxOffSec) * state.autoRate;
+                state.balance = (data.balance || 0) + earnedOffline;
+                
+                // Восстановление энергии в оффлайне (200 энергии за 60 секунд)
+                const energyRegenPerSec = state.maxEnergy / 60;
+                state.energy = Math.min(state.maxEnergy, state.energy + (offlineSeconds * energyRegenPerSec));
+
+                const earnedOfflineFloor = Math.floor(earnedOffline);
+                if (earnedOfflineFloor > 0) {
+                    setTimeout(() => showNotification(`🤖 Автокликер добыл +${formatNum(earnedOfflineFloor)} LSPK пока вас не было!`), 2500);
+                }
+            };
+
+            if (hasFirebase && auth && db) {
+                try {
+                    let userCred;
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) userCred = await signInWithCustomToken(auth, __initial_auth_token);
+                    else userCred = await signInAnonymously(auth);
+                    state.user = userCred.user;
+                    tempUserId = userCred.user.uid;
+                } catch (e) {
+                    try { const fbCred = await signInAnonymously(auth); state.user = fbCred.user; tempUserId = fbCred.user.uid; } 
+                    catch(err) { console.warn("Firebase Auth Error"); }
+                }
+
+                state.effectiveUserId = tempUserId;
+
+                try {
+                    if (state.user) {
+                        const docRef = doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current');
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            applyLoadedData(docSnap.data());
+                        }
+                    }
+                } catch(e) { console.error("Ошибка загрузки данных", e); }
+            } else {
+                state.effectiveUserId = tempUserId;
+                
+                // === ЗАГРУЗКА СОХРАНЕНИЯ ИЗ КЭША БРАУЗЕРА (LOCALSTORAGE) ===
+                try {
+                    const localSave = localStorage.getItem('lspk_local_save');
+                    if (localSave) {
+                        applyLoadedData(JSON.parse(localSave));
+                        console.log("Локальное сохранение успешно загружено!");
+                    }
+                } catch(e) {
+                    console.error("Ошибка чтения локального сохранения", e);
+                }
+            }
+
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                updateAllUI();
+                startLoops();
+            }, 2500); // 2.5 сек на показ анимации логотипа
+
+            if (hasFirebase && db && state.user) {
+                try {
+                    onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'transfers'), (snapshot) => {
+                        snapshot.forEach(docSnap => {
+                            const t = docSnap.data();
+                            if (t.to === state.effectiveUserId && !state.processedTransfers.includes(t.id)) {
+                                if (t.currency === 'lspk') state.balance += t.amount;
+                                else if (t.currency === 'rub') state.walletInfo.rubBalance += t.amount;
+                                else state.portfolio[t.currency] = (state.portfolio[t.currency] || 0) + t.amount;
+                                
+                                state.processedTransfers.push(t.id);
+                                showNotification(`Получен перевод от @${t.fromUsername}!`);
+                                updateAllUI();
+                            }
+                        });
+                    });
+                } catch(e) {}
+            }
+        }
+
+        // --- СОХРАНЕНИЕ ---
+        function saveGame() {
+            const saveData = {
+                balance: state.balance,
+                clickPower: state.clickPower,
+                autoRate: state.autoRate,
+                energy: state.energy,
+                maxEnergy: state.maxEnergy,
+                maxOfflineHours: state.maxOfflineHours,
+                portfolio: state.portfolio,
+                walletInfo: state.walletInfo,
+                stockPrices: state.stockPrices,
+                processedTransfers: state.processedTransfers,
+                priceHistory: state.priceHistory,
+                lastTime: Date.now()
+            };
+
+            if(!hasFirebase || !db || !state.effectiveUserId || !state.user) {
+                localStorage.setItem('lspk_local_save', JSON.stringify(saveData));
+            } else {
+                setDoc(doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current'), saveData, { merge: true }).catch(()=>{});
+            }
+        }
+
+        function startLoops() {
+            // Игровой цикл 5 раз в секунду (каждые 200 мс)
+            setInterval(() => {
+                let uiNeedsUpdate = false;
+
+                // Автокликер ТЕПЕРЬ РАБОТАЕТ ТОЛЬКО ОФЛАЙН!
+                // Мы убрали начисление здесь, чтобы монеты не капали, пока вы в сети (в самом приложении).
+                // Автокликер включится в работу, как только вы выйдете из приложения.
+
+                // 2. Восстановление энергии
+                // 200 энергии за 60 секунд. 200/60 = 3.333 энергии в секунду
+                // Значит в тике (0.2 сек) это (200/60)*0.2 = 0.666 энергии
+                if (state.energy < state.maxEnergy) {
+                    state.energy = Math.min(state.maxEnergy, state.energy + (state.maxEnergy / 60) * 0.2);
+                    uiNeedsUpdate = true;
+                }
+
+                if (uiNeedsUpdate) {
+                    document.getElementById('ui-main-balance').innerText = Math.floor(state.balance).toLocaleString('ru-RU');
+                    document.getElementById('ui-energy-text').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
+                    document.getElementById('ui-energy-bar').style.width = `${(state.energy / state.maxEnergy) * 100}%`;
+                }
+            }, 200);
+
+            // Луп рынка
+            setInterval(() => {
+                Object.keys(state.stockPrices).forEach(key => {
+                    const jitter = (Math.random() - 0.5) * 0.001;
+                    state.stockPrices[key] = Math.max(1, Math.round(state.stockPrices[key] * (1 + jitter)));
+                    const hist = state.priceHistory[key] || Array(20).fill(state.stockPrices[key]);
+                    hist.shift(); hist.push(state.stockPrices[key]);
+                    state.priceHistory[key] = hist;
+                });
+                if(uiState.activeTab === 'exchange' && uiState.exchangeView === 'terminal') renderTerminal();
+                if(uiState.activeTab === 'exchange' && uiState.exchangeView === 'list') renderExchangeList();
+            }, 5000);
+
+            // Сохранение каждые 10 сек
+            setInterval(saveGame, 10000);
+        }
+
+        // Сохранение при закрытии/обновлении
+        window.addEventListener('beforeunload', saveGame);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') saveGame();
+        });
+
+        // === ОБРАБОТЧИКИ СОБЫТИЙ ===
+
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+        // КЛИКЕР: Реальное начисление монет
+        function handleTap(clientX, clientY) {
+            // Проверяем, хватает ли энергии для клика
+            if (state.energy < state.clickPower) return;
+
+            // Начисление монет и снятие энергии
+            state.energy -= state.clickPower;
+            state.balance += state.clickPower;
+
+            // Мгновенное обновление UI для отзывчивости
+            document.getElementById('ui-main-balance').innerText = Math.floor(state.balance).toLocaleString('ru-RU');
+            document.getElementById('ui-energy-text').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
+            document.getElementById('ui-energy-bar').style.width = `${(state.energy / state.maxEnergy) * 100}%`;
+
+            // Анимация вылетающей цифры
+            const clickEl = document.createElement('div');
+            clickEl.className = "pointer-events-none fixed z-50 animate-float-up text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(252,213,53,0.8)]";
+            clickEl.innerText = `+${state.clickPower}`;
+            clickEl.style.left = `${clientX - 10}px`;
+            clickEl.style.top = `${clientY - 30}px`;
+            document.body.appendChild(clickEl);
+            setTimeout(() => clickEl.remove(), 800);
+
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            else if (window.navigator?.vibrate) window.navigator.vibrate(15);
+        }
+
+        const coinBtn = document.getElementById('coin-button');
+        coinBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touches = e.changedTouches;
+            for (let i = 0; i < touches.length; i++) handleTap(touches[i].clientX, touches[i].clientY);
+        });
+        coinBtn.addEventListener('mousedown', (e) => handleTap(e.clientX, e.clientY));
+
+        // Бусты
+        document.getElementById('btn-upgrade-click').addEventListener('click', () => {
+            const cost = Math.floor(50 * Math.pow(1.5, state.clickPower - 1));
+            if(state.balance >= cost) {
+                state.balance -= cost;
+                state.clickPower += 1;
+                showNotification(`Улучшено! Сила клика: +${state.clickPower}`);
+                updateAllUI();
+                saveGame();
+            }
+        });
+        document.getElementById('btn-upgrade-auto').addEventListener('click', () => {
+            const cost = Math.floor(100 * Math.pow(1.5, state.autoRate));
+            if(state.balance >= cost) {
+                state.balance -= cost;
+                state.autoRate += 1;
+                showNotification(`Автокликер запущен: ${state.autoRate} LSPK/сек`);
+                updateAllUI();
+                saveGame();
+            }
+        });
+
+        document.querySelectorAll('.btn-category').forEach(btn => btn.addEventListener('click', () => { uiState.exchangeCategory = btn.dataset.cat; switchExchangeView('list'); }));
+        document.getElementById('btn-back-categories').addEventListener('click', () => switchExchangeView('categories'));
+        document.getElementById('btn-back-list').addEventListener('click', () => { uiState.selectedStock = null; switchExchangeView('list'); });
+        
+        document.getElementById('btn-mode-buy').addEventListener('click', () => { uiState.tradeMode = 'buy'; document.getElementById('trade-amount').value=''; renderTerminal(); });
+        document.getElementById('btn-mode-sell').addEventListener('click', () => { uiState.tradeMode = 'sell'; document.getElementById('trade-amount').value=''; renderTerminal(); });
+        document.getElementById('trade-amount').addEventListener('input', renderTerminal);
+        
+        document.getElementById('btn-max-trade').addEventListener('click', () => {
+            const stock = uiState.selectedStock; const curP = state.stockPrices[stock.id] || stock.price;
+            if(uiState.tradeMode === 'buy') { if(curP) document.getElementById('trade-amount').value = Math.floor(state.walletInfo.rubBalance / curP); } 
+            else document.getElementById('trade-amount').value = state.portfolio[stock.id] || 0;
+            renderTerminal();
+        });
+
+        document.getElementById('btn-confirm-trade').addEventListener('click', () => {
+            const amount = Math.floor(parseFloat(document.getElementById('trade-amount').value));
+            const stock = uiState.selectedStock;
+            if(isNaN(amount) || amount <= 0 || !stock) return;
+            const curP = state.stockPrices[stock.id] || stock.price; const cost = amount * curP;
+
+            if (uiState.tradeMode === 'buy' && state.walletInfo.rubBalance >= cost) {
+                state.walletInfo.rubBalance -= cost; state.portfolio[stock.id] = (state.portfolio[stock.id] || 0) + amount;
+                const newP = Math.round(curP * Math.pow(1.02, amount));
+                state.stockPrices[stock.id] = newP;
+                const hist = state.priceHistory[stock.id] || Array(20).fill(curP); hist.shift(); hist.push(newP); state.priceHistory[stock.id] = hist;
+                showNotification(`Успешно куплено ${amount} ${stock.ticker}`);
+            } else if (uiState.tradeMode === 'sell' && (state.portfolio[stock.id] || 0) >= amount) {
+                state.portfolio[stock.id] -= amount; state.walletInfo.rubBalance += cost;
+                const newP = Math.max(1, Math.round(curP * Math.pow(0.98, amount)));
+                state.stockPrices[stock.id] = newP;
+                const hist = state.priceHistory[stock.id] || Array(20).fill(curP); hist.shift(); hist.push(newP); state.priceHistory[stock.id] = hist;
+                showNotification(`Успешно продано ${amount} ${stock.ticker}`);
+            } else { showNotification(uiState.tradeMode === 'buy' ? 'Недостаточно ₽' : 'Недостаточно акций'); return; }
+            document.getElementById('trade-amount').value = ''; updateAllUI(); saveGame();
+        });
+
+        // ГАРАНТИРОВАННЫЙ ПОДАРОК ПРИ РЕГИСТРАЦИИ (200р + 50 LSPK)
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fname = document.getElementById('reg-fname').value.trim();
+            const lname = document.getElementById('reg-lname').value.trim();
+            const uname = document.getElementById('reg-uname').value.trim().replace('@','').toLowerCase();
+            const err = document.getElementById('reg-error');
+            const btn = document.getElementById('reg-btn');
+            
+            err.classList.add('hidden'); btn.innerText = 'Создание...'; btn.disabled = true;
+
+            if (hasFirebase && db && state.user) {
+                try {
+                    const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'usernames'));
+                    if (snap.docs.some(d => d.id === uname)) { err.innerText = 'Ник уже занят!'; err.classList.remove('hidden'); btn.innerText = 'Получить бонус'; btn.disabled = false; return; }
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'usernames', uname), { uid: state.effectiveUserId });
+                    
+                    state.walletInfo = { registered: true, firstName: fname, lastName: lname, username: uname, rubBalance: 200 };
+                    state.balance += 50; 
+                    showNotification('Бонус +50 LSPK и 200 ₽ за регистрацию! 🎁');
+                } catch(ex) { err.innerText='Ошибка сети'; err.classList.remove('hidden'); btn.innerText = 'Получить бонус'; btn.disabled = false; return; }
+            } else {
+                state.walletInfo = { registered: true, firstName: fname, lastName: lname, username: uname, rubBalance: 200 };
+                state.balance += 50; 
+                showNotification('Бонус +50 LSPK и 200 ₽ за регистрацию! 🎁');
+            }
+
+            uiState.walletView = 'main'; updateAllUI(); btn.innerText = 'Получить бонус'; btn.disabled = false;
+            saveGame(); // Принудительное сохранение после регистрации
+        });
+
+        document.getElementById('btn-transfer-rub').addEventListener('click', () => { uiState.transferCurrency = 'rub'; uiState.walletView = 'transfer'; renderWallet(); });
+        document.getElementById('btn-back-to-wallet').addEventListener('click', () => { uiState.walletView = 'main'; document.getElementById('transfer-error').classList.add('hidden'); renderWallet(); });
+        
+        document.getElementById('btn-submit-transfer').addEventListener('click', async () => {
+            const amount = Math.floor(parseFloat(document.getElementById('transfer-amount').value));
+            const target = document.getElementById('transfer-target').value.trim().replace('@','').toLowerCase();
+            const err = document.getElementById('transfer-error'); const btnT = document.getElementById('transfer-btn-text');
+            const cur = uiState.transferCurrency;
+
+            err.classList.add('hidden');
+            let avail = cur === 'rub' ? state.walletInfo.rubBalance : (state.portfolio[cur] || 0);
+            if(isNaN(amount) || amount <= 0 || amount > avail) { err.innerText='Недостаточно актива'; err.classList.remove('hidden'); return; }
+
+            btnT.innerText = 'Обработка';
+            if (hasFirebase && db && state.user) {
+                try {
+                    const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'usernames'));
+                    const recDoc = snap.docs.find(d => d.id === target);
+                    if(!recDoc || recDoc.data().uid === state.effectiveUserId) { err.innerText='Получатель не найден'; err.classList.remove('hidden'); btnT.innerText = 'Отправить'; return; }
+                    const trId = `tr_${Date.now()}`;
+                    if(cur==='rub') state.walletInfo.rubBalance -= amount; else state.portfolio[cur] -= amount;
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'transfers', trId), { id: trId, from: state.effectiveUserId, fromUsername: state.walletInfo.username, to: recDoc.data().uid, amount, currency: cur, timestamp: Date.now() });
+                    showNotification("Успешно отправлено!");
+                } catch(ex) { err.innerText='Ошибка'; err.classList.remove('hidden'); btnT.innerText = 'Отправить'; return; }
+            } else {
+                if(cur==='rub') state.walletInfo.rubBalance -= amount; else state.portfolio[cur] -= amount;
+                showNotification("Тест: Перевод отправлен!");
+            }
+            uiState.walletView = 'main'; document.getElementById('transfer-target').value=''; document.getElementById('transfer-amount').value=''; updateAllUI(); btnT.innerText = 'Отправить';
+            saveGame();
+        });
+
+        window.appAPI = {
+            goToExchange: (stockId, mode) => { const stock = stocksList.find(s => s.id === stockId); if(!stock) return; switchTab('exchange'); uiState.exchangeCategory = 'stocks'; uiState.selectedStock = stock; uiState.tradeMode = mode; document.getElementById('trade-amount').value = ''; switchExchangeView('terminal'); },
+            openTerminal: (stockId) => { const list = uiState.exchangeCategory === 'stocks' ? stocksList : coinsList; const stock = list.find(s => s.id === stockId); if(stock.price === null) { showNotification("куда тянешь свои грязные пальчики жди листинга хитрец"); return; } uiState.selectedStock = stock; uiState.tradeMode = 'buy'; document.getElementById('trade-amount').value = ''; switchExchangeView('terminal'); },
+            openTransfer: (curId) => { uiState.transferCurrency = curId; uiState.walletView = 'transfer'; renderWallet(); },
+            setTransferCur: (cur) => { uiState.transferCurrency = cur; renderWallet(); },
+            fakeLspkAction: () => showNotification("куда тянешь свои грязные пальчики жди листинга хитрец")
+        };
+
+        // Запуск
+        initApp();
+    </script>
+</body>
+</html>
