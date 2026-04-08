@@ -121,7 +121,7 @@
                 </svg>
             </div>
             <h1 class="text-4xl font-black text-white tracking-widest mb-2 drop-shadow-md">LSPK</h1>
-            <p class="text-[#848E9C] text-[10px] uppercase tracking-[0.3em] mb-12 font-bold text-center">Загрузка модулей...</p>
+            <p class="text-[#848E9C] text-[10px] uppercase tracking-[0.3em] mb-12 font-bold text-center" id="loading-text">Синхронизация...</p>
             <div class="w-full max-w-[200px] h-1.5 bg-[#2B3139] rounded-full overflow-hidden relative">
                 <div class="h-full bg-gradient-to-r from-[#FEE140] to-[#F3BA2F] w-full rounded-full animate-loading"></div>
             </div>
@@ -160,11 +160,9 @@
               </div>
 
               <div class="flex-1 flex items-center justify-center my-4 w-full">
-                <!-- Главная кнопка кликера -->
                 <button id="coin-button" style="touch-action: manipulation;" class="relative rounded-full transition-transform active:scale-[0.96] w-[clamp(200px,65vw,300px)] aspect-square group focus:outline-none select-none">
                   <div class="absolute inset-0 rounded-full bg-[#FCD535] blur-3xl opacity-20 group-active:opacity-40 transition-opacity duration-200"></div>
                   
-                  <!-- Прямой SVG для кнопки (Тот же премиум логотип) -->
                   <svg viewBox="0 0 400 400" class="w-full h-full drop-shadow-2xl pointer-events-none">
                       <defs>
                           <linearGradient id="gold-bright-btn" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -277,7 +275,6 @@
                     <span class="text-[#848E9C] text-[10px] uppercase font-black tracking-widest">Основной баланс</span>
                     <div class="text-4xl font-black text-white font-mono mt-1 mb-4"><span id="ui-rub-balance">0</span> <span class="text-xl text-[#848E9C]">₽</span></div>
                     
-                    <!-- Единственная кнопка в основном балансе -->
                     <button onclick="window.appAPI.goToExchangeCategory('stocks')" class="w-full bg-[#2B3139] py-3.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all text-white">
                         <i data-lucide="bar-chart-2" class="text-[#FCD535]" width="16" height="16"></i> Вложить
                     </button>
@@ -289,7 +286,6 @@
                     
                     <div class="flex justify-between items-start relative z-10">
                       <div class="flex items-center gap-4">
-                        <!-- НОВЫЙ ПРОСТОЙ SVG ЛОГОТИП LSPK КАК НА СКРИНЕ 1 -->
                         <div class="w-14 h-14 shrink-0 flex items-center justify-center">
                             <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
                                 <circle cx="50" cy="50" r="46" fill="none" stroke="#FF9800" stroke-width="8" stroke-dasharray="2 3" />
@@ -321,22 +317,7 @@
                   </div>
                 </div>
 
-                <div id="wallet-transfer" class="hidden flex flex-col h-full">
-                  <div class="flex items-center mb-6">
-                      <button id="btn-back-to-wallet" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
-                      <h2 class="text-lg font-bold text-white">Перевод актива</h2>
-                  </div>
-                  <div class="bg-[#181A20] border border-[#2B3139] rounded-2xl p-5 space-y-4">
-                    <p class="text-[10px] text-[#848E9C] uppercase font-bold ml-1">Что отправляем?</p>
-                    <div id="transfer-currency-selector" class="flex flex-wrap gap-2 mb-4"></div>
-                    <input id="transfer-target" placeholder="username друга" class="w-full bg-[#0B0E14] border border-[#2B3139] rounded-xl p-4 text-white outline-none" />
-                    <input id="transfer-amount" type="number" placeholder="Количество" class="w-full bg-[#0B0E14] border border-[#2B3139] rounded-xl p-4 text-white outline-none" />
-                    <p id="transfer-error" class="hidden text-[#F6465D] text-xs font-bold"></p>
-                    <button id="btn-submit-transfer" class="w-full bg-[#0ECB81] text-white font-black py-4 rounded-xl flex justify-center items-center gap-2 shadow-lg shadow-[#0ECB81]/10 active:scale-[0.98] transition-all">
-                      <i data-lucide="send" width="20" height="20"></i> <span id="transfer-btn-text">Отправить</span>
-                    </button>
-                  </div>
-                </div>
+                <div id="wallet-transfer" class="hidden flex flex-col h-full"></div>
             </div>
 
             <!-- Вкладка: БИРЖА -->
@@ -349,12 +330,9 @@
                          <i data-lucide="chevron-right" class="ml-auto text-[#848E9C]"></i>
                       </button>
                       <button data-cat="coins" class="btn-category w-full bg-[#181A20] p-5 rounded-2xl border border-[#2B3139] flex items-center gap-4 active:scale-95 shadow-lg">
-                         
-                         <!-- Возвращаем стиль кнопки как в Акциях (Скрин 3) -->
                          <div class="w-12 h-12 rounded-full bg-[#FCD535]/10 flex items-center justify-center shrink-0">
                              <i data-lucide="coins" class="text-[#FCD535]" width="24" height="24"></i>
                          </div>
-
                          <div class="text-left"><p class="text-white font-bold text-lg">Койны</p><p class="text-[#848E9C] text-xs">LSPK и внешние активы</p></div>
                          <i data-lucide="chevron-right" class="ml-auto text-[#848E9C]"></i>
                       </button>
@@ -364,7 +342,6 @@
                     <div id="exchange-assets-container" class="space-y-2"></div>
                 </div>
                 
-                <!-- Терминал Акций -->
                 <div id="exchange-terminal" class="hidden flex flex-col h-full">
                      <div class="flex items-center justify-between mb-4">
                         <button id="btn-back-list" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
@@ -402,7 +379,6 @@
                      </div>
                 </div>
 
-                <!-- Страница Листинга LSPK -->
                 <div id="exchange-listing" class="hidden flex flex-col h-full items-center justify-center pb-20">
                      <div class="w-full flex items-center mb-auto pt-4">
                         <button id="btn-back-list-listing" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
@@ -419,7 +395,6 @@
                <div class="mt-4 space-y-4">
                   <h2 class="text-[#848E9C] text-[10px] font-black uppercase tracking-[0.2em] ml-1 mb-2 text-center">Прокачка мощностей</h2>
                   
-                  <!-- Мультитап -->
                   <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
                     <div class="flex items-center gap-4">
                       <div class="w-14 h-14 rounded-2xl bg-[#FCD535]/10 flex items-center justify-center border border-[#FCD535]/20"><i data-lucide="mouse-pointer-click" class="text-[#FCD535]" width="28" height="28"></i></div>
@@ -430,7 +405,6 @@
                     </button>
                   </div>
                   
-                  <!-- Автокликер -->
                   <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
                     <div class="flex items-center gap-4">
                       <div class="w-14 h-14 rounded-2xl bg-[#2962FF]/10 flex items-center justify-center border border-[#2962FF]/20"><i data-lucide="bot" class="text-[#2962FF]" width="28" height="28"></i></div>
@@ -441,7 +415,6 @@
                     </button>
                   </div>
 
-                  <!-- Батарейка -->
                   <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
                     <div class="flex items-center gap-4">
                       <div class="w-14 h-14 rounded-2xl bg-[#0ECB81]/10 flex items-center justify-center border border-[#0ECB81]/20"><i data-lucide="battery-charging" class="text-[#0ECB81]" width="28" height="28"></i></div>
@@ -497,7 +470,6 @@
         }
         const tgUser = tg?.initDataUnsafe?.user;
 
-        // Новая функция генерации токена в стиле Скрина 1
         const getSimpleLspkLogo = (sizeClass) => `
         <div class="${sizeClass} shrink-0 flex items-center justify-center">
             <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
@@ -510,7 +482,9 @@
         </div>`;
 
         // === ИГРОВОЕ СОСТОЯНИЕ ===
+        // ДОБАВЛЕНА БЛОКИРОВКА isDataLoaded ДЛЯ ЗАЩИТЫ ОТ ОБНУЛЕНИЯ БАЗЫ
         let state = {
+            isDataLoaded: false,
             effectiveUserId: null,
             balance: 0,
             clickPower: 1,      
@@ -521,8 +495,7 @@
             portfolio: { bufx: 0, tepx: 0, kafx: 0 },
             stockPrices: { bufx: 200, tepx: 250, kafx: 165 },
             priceHistory: { bufx: Array(20).fill(200), tepx: Array(20).fill(250), kafx: Array(20).fill(165) },
-            walletInfo: { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 },
-            processedTransfers: []
+            walletInfo: { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 }
         };
 
         let uiState = { activeTab: 'mine', walletView: 'main', exchangeView: 'categories', tradeMode: 'buy', selectedStock: null, transferCurrency: 'rub' };
@@ -548,6 +521,8 @@
 
         // === ОБНОВЛЕНИЕ UI ===
         function updateAllUI() {
+            if (!state.isDataLoaded) return;
+
             document.getElementById('ui-main-balance').innerText = formatNum(state.balance);
             document.getElementById('ui-click-power').innerText = state.clickPower;
             document.getElementById('ui-auto-rate').innerText = state.autoRate;
@@ -560,7 +535,6 @@
                 document.getElementById('ui-auto-status').classList.replace("text-[#848E9C]", "text-[#0ECB81]");
             }
 
-            // Прокачка и логика 12 уровней
             const clickMaxed = state.clickPower >= 12;
             const autoMaxed = state.autoRate >= 12;
             const batteryMaxed = state.maxEnergy >= 1000;
@@ -592,9 +566,8 @@
         function renderWallet() {
             const elReg = document.getElementById('wallet-register');
             const elMain = document.getElementById('wallet-main');
-            const elTrans = document.getElementById('wallet-transfer');
             
-            elReg.classList.add('hidden'); elMain.classList.add('hidden'); elTrans.classList.add('hidden');
+            elReg.classList.add('hidden'); elMain.classList.add('hidden');
 
             if (!state.walletInfo.registered) {
                 elReg.classList.remove('hidden');
@@ -631,13 +604,6 @@
                 });
                 portfolioEmpty.classList.toggle('hidden', hasAssets);
                 lucide.createIcons();
-            } else if (uiState.walletView === 'transfer') {
-                elTrans.classList.remove('hidden');
-                const curSelector = document.getElementById('transfer-currency-selector');
-                curSelector.innerHTML = `<button onclick="window.appAPI.setTransferCur('rub')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all border ${uiState.transferCurrency === 'rub' ? 'bg-[#2B3139] text-white border-white/20' : 'bg-transparent text-[#848E9C] border-white/5'}">Рубли ₽</button>`;
-                stocksList.forEach(s => {
-                    if (state.portfolio[s.id] > 0) curSelector.innerHTML += `<button onclick="window.appAPI.setTransferCur('${s.id}')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all border ${uiState.transferCurrency === s.id ? 'bg-[#2B3139] text-white border-white/20' : 'bg-transparent text-[#848E9C] border-white/5'}">${s.ticker}</button>`;
-                });
             }
         }
 
@@ -651,7 +617,6 @@
                 const currentPrice = state.stockPrices[stock.id] || stock.price;
                 const count = stock.id === 'lspk' ? Math.floor(state.balance) : (state.portfolio[stock.id] || 0);
                 
-                // ВАЖНО: Если это наш токен LSPK, рисуем правильный золотой логотип
                 const iconHtml = stock.id === 'lspk' 
                     ? getSimpleLspkLogo("w-10 h-10")
                     : `<div class="w-10 h-10 bg-[#2B3139] rounded-full flex items-center justify-center shrink-0"><i data-lucide="${stock.icon}" width="18" height="18" style="color:${stock.color}"></i></div>`;
@@ -740,7 +705,7 @@
                 state.portfolio = data.portfolio || { bufx: 0, tepx: 0, kafx: 0 }; state.stockPrices = data.stockPrices || { bufx: 200, tepx: 250, kafx: 165 };
                 if(data.priceHistory) state.priceHistory = data.priceHistory;
                 state.walletInfo = data.walletInfo || { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 };
-                state.processedTransfers = data.processedTransfers || [];
+                
                 const now = Date.now(); const offlineSeconds = Math.floor((now - (data.lastTime || now)) / 1000);
                 const earnedOffline = Math.min(offlineSeconds, 12 * 3600) * state.autoRate;
                 state.balance = (data.balance || 0) + earnedOffline;
@@ -748,48 +713,53 @@
                 if (Math.floor(earnedOffline) > 0) setTimeout(() => showNotification(`🤖 Автокликер добыл +${formatNum(earnedOffline)} LSPK!`), 2500);
             };
 
+            // Ждем базу данных и как минимум 1.5 секунды для экрана загрузки
+            let minLoadingTime = new Promise(resolve => setTimeout(resolve, 1500));
+            let dbLoadPromise = Promise.resolve();
+
             if (hasFirebase && db) {
-                try { if (auth) await signInAnonymously(auth); } catch(e) {}
-                try {
-                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current'));
-                    if (docSnap.exists()) applyLoadedData(docSnap.data());
-                } catch(e) {}
+                dbLoadPromise = (async () => {
+                    try { if (auth) await signInAnonymously(auth); } catch(e) {}
+                    try {
+                        const docSnap = await getDoc(doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current'));
+                        if (docSnap.exists()) applyLoadedData(docSnap.data());
+                    } catch(e) {}
+                })();
             } else {
                 try { const localSave = localStorage.getItem('lspk_local_save'); if (localSave) applyLoadedData(JSON.parse(localSave)); } catch(e) {}
             }
 
+            // Ждем завершения обоих процессов
+            await Promise.all([dbLoadPromise, minLoadingTime]);
+
+            // Разрешаем игре работать (защита от сохранения нулей)
+            state.isDataLoaded = true;
+
+            document.getElementById('loading-text').innerText = "Готово!";
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                updateAllUI(); startLoops();
-            }, 2500);
-
-            if (hasFirebase && db) {
-                try {
-                    onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'transfers'), (snapshot) => {
-                        snapshot.forEach(docSnap => {
-                            const t = docSnap.data();
-                            if (t.to === state.effectiveUserId && !state.processedTransfers.includes(t.id)) {
-                                if (t.currency === 'rub') state.walletInfo.rubBalance += t.amount; else state.portfolio[t.currency] = (state.portfolio[t.currency] || 0) + t.amount;
-                                state.processedTransfers.push(t.id); showNotification(`Получен перевод!`); updateAllUI(); saveGame();
-                            }
-                        });
-                    });
-                } catch(e) {}
-            }
+                updateAllUI(); 
+                startLoops();
+            }, 300);
         }
 
+        // ФУНКЦИЯ СОХРАНЕНИЯ С ЗАЩИТОЙ
         function saveGame() {
-            const saveData = { balance: state.balance, clickPower: state.clickPower, autoRate: state.autoRate, energy: state.energy, maxEnergy: state.maxEnergy, portfolio: state.portfolio, walletInfo: state.walletInfo, stockPrices: state.stockPrices, processedTransfers: state.processedTransfers, priceHistory: state.priceHistory, lastTime: Date.now() };
+            if (!state.isDataLoaded) return; // ПРЕДОТВРАЩАЕТ СТИРАНИЕ ДАННЫХ В ОБЛАКЕ
+
+            const saveData = { balance: state.balance, clickPower: state.clickPower, autoRate: state.autoRate, energy: state.energy, maxEnergy: state.maxEnergy, portfolio: state.portfolio, walletInfo: state.walletInfo, stockPrices: state.stockPrices, priceHistory: state.priceHistory, lastTime: Date.now() };
             localStorage.setItem('lspk_local_save', JSON.stringify(saveData));
             if(hasFirebase && db && state.effectiveUserId) setDoc(doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current'), saveData, { merge: true }).catch(()=>{});
         }
 
         function startLoops() {
             setInterval(() => {
+                if (!state.isDataLoaded) return;
                 if (state.energy < state.maxEnergy) { state.energy = Math.min(state.maxEnergy, state.energy + (state.maxEnergy / 60) * 0.2); updateAllUI(); }
             }, 200);
             setInterval(() => {
+                if (!state.isDataLoaded) return;
                 Object.keys(state.stockPrices).forEach(key => {
                     const jitter = (Math.random() - 0.5) * 0.001;
                     state.stockPrices[key] = Math.max(1, Math.round(state.stockPrices[key] * (1 + jitter)));
@@ -801,7 +771,9 @@
         }
 
         function handleTap(clientX, clientY) {
-            if (state.energy < state.clickPower) return;
+            // Защита: не даем кликать, пока данные не скачаны
+            if (!state.isDataLoaded || state.energy < state.clickPower) return;
+            
             state.energy -= state.clickPower; state.balance += state.clickPower;
             updateAllUI();
             const clickEl = document.createElement('div');
@@ -817,39 +789,26 @@
 
         // Логика кнопок прокачки
         document.getElementById('btn-upgrade-click').addEventListener('click', () => {
-            if (state.clickPower >= 12) return;
+            if (!state.isDataLoaded || state.clickPower >= 12) return;
             const cost = Math.floor(50 * Math.pow(1.5, state.clickPower - 1));
             if(state.balance >= cost) { state.balance -= cost; state.clickPower += 1; showNotification(`Улучшено! Сила клика: +${state.clickPower}`); updateAllUI(); saveGame(); }
         });
         document.getElementById('btn-upgrade-auto').addEventListener('click', () => {
-            if (state.autoRate >= 12) return;
+            if (!state.isDataLoaded || state.autoRate >= 12) return;
             const cost = Math.floor(100 * Math.pow(1.5, state.autoRate));
             if(state.balance >= cost) { state.balance -= cost; state.autoRate += 1; showNotification(`Автокликер запущен: ${state.autoRate} /сек`); updateAllUI(); saveGame(); }
         });
         document.getElementById('btn-upgrade-battery').addEventListener('click', () => {
-            if (state.maxEnergy >= 1000) return;
+            if (!state.isDataLoaded || state.maxEnergy >= 1000) return;
             const cost = Math.floor(150 * Math.pow(1.5, (state.maxEnergy - 200) / 100));
             if(state.balance >= cost) { state.balance -= cost; state.maxEnergy += 100; showNotification(`Энергия увеличена! Макс: ${state.maxEnergy}`); updateAllUI(); saveGame(); }
         });
 
-        // -------------------------------------------------------------
-        // СУПЕР-НАДЕЖНЫЙ ПЕРЕХВАТЧИК КЛИКОВ ПО КНОПКАМ НАВИГАЦИИ (ФИКС)
-        // -------------------------------------------------------------
         document.addEventListener('click', function(e) {
-            // 1. Нижнее меню вкладок
             const navBtn = e.target.closest('.nav-btn');
-            if (navBtn) {
-                switchTab(navBtn.dataset.tab);
-                return;
-            }
-
-            // 2. Кнопки выбора категории (Акции / Койны)
+            if (navBtn) { switchTab(navBtn.dataset.tab); return; }
             const btnCat = e.target.closest('.btn-category');
-            if (btnCat) {
-                uiState.exchangeCategory = btnCat.dataset.cat;
-                switchExchangeView('list');
-                return;
-            }
+            if (btnCat) { uiState.exchangeCategory = btnCat.dataset.cat; switchExchangeView('list'); return; }
         });
 
         document.getElementById('btn-back-categories').addEventListener('click', () => switchExchangeView('categories'));
@@ -877,6 +836,7 @@
             } else { showNotification('Недостаточно средств'); return; }
             document.getElementById('trade-amount').value = ''; updateAllUI(); saveGame();
         });
+
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const fn = document.getElementById('reg-fname').value.trim(); const ln = document.getElementById('reg-lname').value.trim(); const un = document.getElementById('reg-uname').value.trim().toLowerCase();
@@ -896,30 +856,8 @@
             }
             uiState.walletView = 'main'; updateAllUI(); btn.innerText = 'Получить бонус'; btn.disabled = false; saveGame();
         });
-        
-        document.getElementById('btn-back-to-wallet').addEventListener('click', () => { uiState.walletView = 'main'; renderWallet(); });
-        
-        document.getElementById('btn-submit-transfer').addEventListener('click', async () => {
-            const amount = Math.floor(parseFloat(document.getElementById('transfer-amount').value));
-            const target = document.getElementById('transfer-target').value.trim().toLowerCase();
-            const cur = uiState.transferCurrency;
-            let avail = cur === 'rub' ? state.walletInfo.rubBalance : (state.portfolio[cur] || 0);
-            if(!amount || amount <= 0 || amount > avail) { showNotification('Недостаточно актива'); return; }
-            if (hasFirebase && db) {
-                try {
-                    const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'usernames'));
-                    const rec = snap.docs.find(d => d.id === target);
-                    if(!rec) { showNotification('Получатель не найден'); return; }
-                    if(cur==='rub') state.walletInfo.rubBalance -= amount; else state.portfolio[cur] -= amount;
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'transfers', `tr_${Date.now()}`), { from: state.effectiveUserId, fromUsername: state.walletInfo.username, to: rec.data().uid, amount, currency: cur, id: Date.now() });
-                    showNotification("Отправлено!");
-                } catch(ex) { showNotification('Ошибка сети'); return; }
-            } else showNotification("Тест: Отправлено!");
-            uiState.walletView = 'main'; updateAllUI(); saveGame();
-        });
 
         window.appAPI = {
-            goToExchangeTab: () => { switchTab('exchange'); switchExchangeView('categories'); },
             goToExchangeCategory: (cat) => { switchTab('exchange'); uiState.exchangeCategory = cat; switchExchangeView('list'); },
             goToExchange: (id, m) => { const s = stocksList.find(x => x.id === id); switchTab('exchange'); uiState.exchangeCategory = 'stocks'; uiState.selectedStock = s; uiState.tradeMode = m; switchExchangeView('terminal'); },
             openTerminal: (id) => { 
@@ -927,11 +865,12 @@
                 uiState.selectedStock = s; 
                 if(id === 'lspk') { switchExchangeView('listing'); return; } 
                 uiState.tradeMode = 'buy'; switchExchangeView('terminal'); 
-            },
-            openTransfer: (c) => { uiState.transferCurrency = c; uiState.walletView = 'transfer'; renderWallet(); },
-            setTransferCur: (c) => { uiState.transferCurrency = c; renderWallet(); },
-            fakeLspkAction: () => showNotification("Ожидайте листинга!")
+            }
         };
+
+        // Защита от сохранения при закрытии вкладки, если данные не загрузились
+        window.addEventListener('beforeunload', () => { if(state.isDataLoaded) saveGame(); });
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && state.isDataLoaded) saveGame(); });
 
         initApp();
     </script>
