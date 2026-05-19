@@ -1,878 +1,460 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LSPK Clicker</title>
-    
-    <!-- КРИТИЧЕСКИ ВАЖНО: Telegram Web App API -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Технические работы | Скоро вернёмся</title>
+  <!-- Подключение Font Awesome для иконок (опционально, но делает красивее) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0B0E14;
-            color: #EAECEF;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            touch-action: none;
-        }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1e2b3c 0%, #0f1a26 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      margin: 0;
+      color: #e0e7f0;
+    }
 
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .maintenance-card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 2.5rem;
+      padding: 2.8rem 2rem;
+      max-width: 550px;
+      width: 100%;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      text-align: center;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-        @keyframes float-up { 
-            0% { transform: translateY(0) scale(1); opacity: 1; } 
-            100% { transform: translateY(-100px) scale(1.5); opacity: 0; } 
-        }
-        .animate-float-up { animation: float-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .coin-shadow { 
-            box-shadow: 0 10px 40px rgba(252, 213, 53, 0.2), inset 0 -10px 20px rgba(202, 138, 4, 0.6), inset 0 10px 20px rgba(255, 255, 255, 0.4); 
-        }
+    .icon-container {
+      margin-bottom: 1.8rem;
+    }
 
-        @keyframes loading {
-            0% { transform: scaleX(0); }
-            50% { transform: scaleX(0.6); }
-            100% { transform: scaleX(1); }
-        }
-        .animate-loading { animation: loading 2s ease-in-out forwards; transform-origin: left; }
+    .gear-icon {
+      font-size: 4.5rem;
+      color: #f6c358;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.4));
+      animation: gentle-spin 8s infinite linear;
+      display: inline-block;
+    }
 
-        @keyframes pulse-glow {
-            0% { transform: scale(0.95); opacity: 0.8; filter: drop-shadow(0 0 20px rgba(252,213,53,0.4)); }
-            100% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 40px rgba(252,213,53,0.8)); }
-        }
-        .animate-pulse-glow { animation: pulse-glow 2s infinite alternate ease-in-out; }
-    </style>
+    @keyframes gentle-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #f9d56e, #f8b042);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .subhead {
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 2.2rem;
+      color: #ccd6e0;
+      line-height: 1.5;
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
+      padding-bottom: 1.5rem;
+    }
+
+    .status-badge {
+      background: rgba(242, 153, 74, 0.15);
+      color: #f6a64d;
+      border: 1px solid rgba(246, 166, 77, 0.4);
+      border-radius: 3rem;
+      padding: 0.5rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(5px);
+    }
+
+    .status-badge i {
+      font-size: 0.8rem;
+      color: #f6a64d;
+    }
+
+    .info-text {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.2rem;
+      margin-bottom: 2.3rem;
+      font-size: 1rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .info-text i {
+      color: #f6c358;
+      margin-right: 0.4rem;
+    }
+
+    .form-section {
+      text-align: left;
+      margin-top: 0.8rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #d1d9e6;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .email-input {
+      flex: 1 1 220px;
+      background: rgba(10, 20, 30, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 3rem;
+      padding: 0.9rem 1.4rem;
+      font-size: 1rem;
+      color: #f0f4fa;
+      outline: none;
+      backdrop-filter: blur(5px);
+      transition: all 0.25s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .email-input::placeholder {
+      color: #8b9bb5;
+      font-weight: 300;
+      font-size: 0.95rem;
+    }
+
+    .email-input:focus {
+      border-color: #f6b83d;
+      box-shadow: 0 0 0 3px rgba(246, 184, 61, 0.3);
+      background: rgba(20, 30, 40, 0.8);
+    }
+
+    .notify-btn {
+      background: #f6b83d;
+      border: none;
+      border-radius: 3rem;
+      padding: 0.9rem 1.8rem;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0f1a26;
+      background: linear-gradient(135deg, #f9d56e, #f6a83d);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+      box-shadow: 0 8px 18px rgba(246, 168, 61, 0.35);
+      border: 1px solid rgba(255, 255, 200, 0.3);
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+
+    .notify-btn:hover {
+      background: linear-gradient(135deg, #ffe08a, #f8b84a);
+      box-shadow: 0 10px 22px rgba(246, 168, 61, 0.5);
+      transform: scale(1.02);
+      color: #000;
+    }
+
+    .notify-btn:active {
+      transform: scale(0.97);
+    }
+
+    .message-area {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      min-height: 2.4rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: 0.2s;
+    }
+
+    .success-message {
+      color: #a7e0a7;
+      background: rgba(50, 100, 50, 0.2);
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+    }
+
+    .error-message {
+      color: #f9a89a;
+      background: rgba(180, 60, 60, 0.2);
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+    }
+
+    .footer-note {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #8b9bb5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-note i {
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 480px) {
+      .maintenance-card {
+        padding: 2rem 1.2rem;
+        border-radius: 2rem;
+      }
+      h1 {
+        font-size: 1.9rem;
+      }
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .notify-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
 </head>
-<body class="flex h-[100dvh] w-full items-center justify-center overflow-hidden">
-
-    <!-- EКРАН ЗАГРУЗКИ -->
-    <div id="loading-screen" class="flex h-full w-full max-w-[430px] flex-col items-center justify-center bg-[#0B0E14] text-[#FCD535] relative overflow-hidden font-sans z-[1000] sm:border-x border-[#2B3139]">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(252,213,53,0.15)_0,transparent_60%)] animate-pulse"></div>
-        <div class="flex flex-col items-center z-10 w-full px-8">
-            <div class="relative w-40 h-40 mb-8 flex items-center justify-center">
-                <svg viewBox="0 0 400 400" class="w-full h-full animate-pulse-glow drop-shadow-2xl">
-                    <defs>
-                        <linearGradient id="gold-bright" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FFF8E1" /><stop offset="25%" stop-color="#FFE082" />
-                            <stop offset="50%" stop-color="#FFB300" /><stop offset="75%" stop-color="#FF8F00" />
-                            <stop offset="100%" stop-color="#E65100" />
-                        </linearGradient>
-                        <linearGradient id="gold-dark" x1="100%" y1="100%" x2="0%" y2="0%">
-                            <stop offset="0%" stop-color="#3E2723" /><stop offset="50%" stop-color="#FF6F00" />
-                            <stop offset="100%" stop-color="#FFC107" />
-                        </linearGradient>
-                        <radialGradient id="cyber-core" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#263238" /><stop offset="70%" stop-color="#11151C" />
-                            <stop offset="100%" stop-color="#000000" />
-                        </radialGradient>
-                        <filter id="inner-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feOffset dx="0" dy="15"/><feGaussianBlur stdDeviation="15" result="offset-blur"/>
-                            <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-                            <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
-                            <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
-                            <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
-                        </filter>
-                        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="4" result="blur" />
-                            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                        </filter>
-                    </defs>
-
-                    <circle cx="200" cy="210" r="185" fill="#000" opacity="0.6" filter="blur(10px)" />
-                    <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-dark)" stroke-width="24" stroke-dasharray="8 6" />
-                    <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-bright)" stroke-width="12" />
-                    <circle cx="200" cy="200" r="179" fill="url(#gold-dark)" />
-                    <circle cx="200" cy="200" r="170" fill="url(#gold-bright)" />
-                    <circle cx="200" cy="200" r="150" fill="url(#cyber-core)" filter="url(#inner-shadow)" />
-                    <circle cx="200" cy="200" r="150" fill="none" stroke="#FFA000" stroke-width="2" opacity="0.5" />
-                    
-                    <g class="origin-center animate-[spin_15s_linear_infinite]">
-                        <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.4" />
-                        <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="3" stroke-dasharray="40 120" opacity="0.8" filter="url(#neon-glow)" />
-                    </g>
-                    <g class="origin-center animate-[spin_20s_linear_infinite_reverse]">
-                        <path d="M 200 65 L 205 75 L 215 75 L 210 85 L 215 95 L 205 95 L 200 105 L 195 95 L 185 95 L 190 85 L 185 75 L 195 75 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                        <path d="M 200 295 L 205 305 L 215 305 L 210 315 L 215 325 L 205 325 L 200 335 L 195 325 L 185 325 L 190 315 L 185 305 L 195 305 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                        <path d="M 65 200 L 75 195 L 75 185 L 85 190 L 95 185 L 95 195 L 105 200 L 95 205 L 95 215 L 85 210 L 75 215 L 75 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                        <path d="M 295 200 L 305 195 L 305 185 L 315 190 L 325 185 L 325 195 L 335 200 L 325 205 L 325 215 L 315 210 L 305 215 L 305 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                    </g>
-
-                    <path d="M 110 110 L 140 140 L 140 260 L 110 290 M 290 110 L 260 140 L 260 260 L 290 290" fill="none" stroke="#FF8F00" stroke-width="2" opacity="0.3" />
-                    <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="url(#gold-dark)" opacity="0.4" />
-                    <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="none" stroke="#FFC107" stroke-width="3" filter="url(#neon-glow)" />
-
-                    <text x="200" y="215" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="#000" text-anchor="middle" letter-spacing="2">LSPK</text>
-                    <text x="200" y="210" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="url(#gold-bright)" text-anchor="middle" letter-spacing="2" filter="url(#neon-glow)">LSPK</text>
-                    <text x="200" y="255" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFCA28" text-anchor="middle" letter-spacing="10" opacity="0.8">TOKEN</text>
-                    
-                    <path d="M 60 200 A 140 140 0 0 1 340 200" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.1" filter="blur(2px)"/>
-                    <path d="M 90 120 A 130 130 0 0 1 200 70" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.4" />
-                </svg>
-            </div>
-            <h1 class="text-4xl font-black text-white tracking-widest mb-2 drop-shadow-md">LSPK</h1>
-            <p class="text-[#848E9C] text-[10px] uppercase tracking-[0.3em] mb-12 font-bold text-center" id="loading-text">Синхронизация...</p>
-            <div class="w-full max-w-[200px] h-1.5 bg-[#2B3139] rounded-full overflow-hidden relative">
-                <div class="h-full bg-gradient-to-r from-[#FEE140] to-[#F3BA2F] w-full rounded-full animate-loading"></div>
-            </div>
-        </div>
+<body>
+  <div class="maintenance-card">
+    
+    <!-- Иконка с анимацией -->
+    <div class="icon-container">
+      <i class="fas fa-cog gear-icon"></i>
     </div>
 
-    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
-    <div id="app-container" class="hidden flex h-full w-full max-w-[430px] flex-col bg-[#0B0E14] relative sm:border-x border-[#2B3139]">
+    <!-- Основной заголовок -->
+    <h1>Технические работы</h1>
+    
+    <!-- Подзаголовок -->
+    <div class="subhead">
+      Мы проводим плановое обновление системы.<br>Сайт временно недоступен.
+    </div>
+
+    <!-- Статус -->
+    <div class="status-badge">
+      <i class="fas fa-circle"></i> Ожидаемое завершение: <strong>сегодня 18:00 (МСК)</strong>
+    </div>
+
+    <!-- Дополнительная информация -->
+    <div class="info-text">
+      <i class="fas fa-tools"></i> Мы улучшаем производительность и добавляем новые функции. 
+      Все данные в безопасности. Приносим извинения за неудобства.
+    </div>
+
+    <!-- Форма для уведомления -->
+    <div class="form-section">
+      <label class="form-label" for="emailInput">
+        <i class="far fa-bell" style="margin-right: 4px;"></i> Узнать первым о запуске
+      </label>
+      
+      <div class="input-group">
+        <input 
+          type="email" 
+          id="emailInput" 
+          class="email-input" 
+          placeholder="Введите ваш email" 
+          autocomplete="email"
+          aria-label="Email для уведомления"
+        >
+        <button id="notifyButton" class="notify-btn">
+          <i class="fas fa-paper-plane"></i> Сообщить
+        </button>
+      </div>
+      
+      <!-- Место для сообщений (успех/ошибка) -->
+      <div id="formMessage" class="message-area"></div>
+    </div>
+
+    <!-- Маленькая сноска -->
+    <div class="footer-note">
+      <i class="far fa-clock"></i> Спасибо за терпение!
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // Получаем элементы DOM
+      const emailInput = document.getElementById('emailInput');
+      const notifyButton = document.getElementById('notifyButton');
+      const formMessage = document.getElementById('formMessage');
+
+      /**
+       * Отображает сообщение пользователю (успех или ошибка)
+       * @param {string} text - текст сообщения
+       * @param {boolean} isSuccess - true если успех, false если ошибка
+       */
+      function showMessage(text, isSuccess = true) {
+        if (!formMessage) return;
         
-        <!-- Уведомления -->
-        <div id="notification-toast" class="hidden absolute top-8 left-1/2 -translate-x-1/2 bg-[#181A20] border border-white/10 text-white px-5 py-3 rounded-2xl font-bold text-xs z-[100] flex items-center gap-3 shadow-2xl backdrop-blur-md max-w-[80%] text-center transition-all duration-300 opacity-0 translate-y-[-20px]">
-            <i data-lucide="check-circle-2" class="text-[#0ECB81] shrink-0" width="16" height="16"></i> 
-            <span id="notification-text"></span>
-        </div>
-
-        <!-- Основной контент -->
-        <main class="flex-1 flex flex-col min-h-0 overflow-y-auto no-scrollbar w-full pt-2" id="main-scroll-area">
-            
-            <!-- Глобальный баланс LSPK -->
-            <div id="global-balance-header" class="flex flex-col items-center justify-center pt-10 pb-4 shrink-0 transition-opacity">
-              <span class="text-[#848E9C] text-[10px] font-bold tracking-widest uppercase mb-1">Баланс LSPK</span>
-              <div class="text-4xl font-black text-white font-mono" id="ui-main-balance">0</div>
-            </div>
-
-            <!-- Вкладка: КЛИКЕР -->
-            <div id="tab-mine" class="flex-1 flex flex-col items-center justify-between px-5 pb-4">
-              <div class="flex items-center gap-3 w-full max-w-[300px]">
-                <div class="flex-1 bg-[#181A20] rounded-xl p-3 border border-[#2B3139] flex flex-col items-center">
-                  <span class="text-[#848E9C] text-[10px] uppercase font-bold">За тап</span>
-                  <div class="text-white font-bold text-sm">+<span id="ui-click-power">1</span></div>
-                </div>
-                <div class="flex-1 bg-[#181A20] rounded-xl p-3 border border-[#2B3139] flex flex-col items-center">
-                  <span class="text-[#848E9C] text-[10px] uppercase font-bold">Офлайн</span>
-                  <div class="text-white font-bold text-sm"><span id="ui-auto-rate">0</span>/сек</div>
-                </div>
-              </div>
-
-              <div class="flex-1 flex items-center justify-center my-4 w-full">
-                <button id="coin-button" style="touch-action: manipulation;" class="relative rounded-full transition-transform active:scale-[0.96] w-[clamp(200px,65vw,300px)] aspect-square group focus:outline-none select-none">
-                  <div class="absolute inset-0 rounded-full bg-[#FCD535] blur-3xl opacity-20 group-active:opacity-40 transition-opacity duration-200"></div>
-                  
-                  <svg viewBox="0 0 400 400" class="w-full h-full drop-shadow-2xl pointer-events-none">
-                      <defs>
-                          <linearGradient id="gold-bright-btn" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stop-color="#FFF8E1" /><stop offset="25%" stop-color="#FFE082" />
-                              <stop offset="50%" stop-color="#FFB300" /><stop offset="75%" stop-color="#FF8F00" />
-                              <stop offset="100%" stop-color="#E65100" />
-                          </linearGradient>
-                          <linearGradient id="gold-dark-btn" x1="100%" y1="100%" x2="0%" y2="0%">
-                              <stop offset="0%" stop-color="#3E2723" /><stop offset="50%" stop-color="#FF6F00" />
-                              <stop offset="100%" stop-color="#FFC107" />
-                          </linearGradient>
-                          <radialGradient id="cyber-core-btn" cx="50%" cy="50%" r="50%">
-                              <stop offset="0%" stop-color="#263238" /><stop offset="70%" stop-color="#11151C" />
-                              <stop offset="100%" stop-color="#000000" />
-                          </radialGradient>
-                          <filter id="inner-shadow-btn" x="-20%" y="-20%" width="140%" height="140%">
-                              <feOffset dx="0" dy="15"/><feGaussianBlur stdDeviation="15" result="offset-blur"/>
-                              <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-                              <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
-                              <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
-                              <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
-                          </filter>
-                          <filter id="neon-glow-btn" x="-50%" y="-50%" width="200%" height="200%">
-                              <feGaussianBlur stdDeviation="4" result="blur" />
-                              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                          </filter>
-                      </defs>
-
-                      <circle cx="200" cy="210" r="185" fill="#000" opacity="0.6" filter="blur(10px)" />
-                      <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-dark-btn)" stroke-width="24" stroke-dasharray="8 6" />
-                      <circle cx="200" cy="200" r="185" fill="none" stroke="url(#gold-bright-btn)" stroke-width="12" />
-                      <circle cx="200" cy="200" r="179" fill="url(#gold-dark-btn)" />
-                      <circle cx="200" cy="200" r="170" fill="url(#gold-bright-btn)" />
-                      <circle cx="200" cy="200" r="150" fill="url(#cyber-core-btn)" filter="url(#inner-shadow-btn)" />
-                      <circle cx="200" cy="200" r="150" fill="none" stroke="#FFA000" stroke-width="2" opacity="0.5" />
-                      
-                      <g class="origin-center animate-[spin_15s_linear_infinite]">
-                          <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.4" />
-                          <circle cx="200" cy="200" r="135" fill="none" stroke="#FFCA28" stroke-width="3" stroke-dasharray="40 120" opacity="0.8" filter="url(#neon-glow-btn)" />
-                      </g>
-                      <g class="origin-center animate-[spin_20s_linear_infinite_reverse]">
-                          <path d="M 200 65 L 205 75 L 215 75 L 210 85 L 215 95 L 205 95 L 200 105 L 195 95 L 185 95 L 190 85 L 185 75 L 195 75 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                          <path d="M 200 295 L 205 305 L 215 305 L 210 315 L 215 325 L 205 325 L 200 335 L 195 325 L 185 325 L 190 315 L 185 305 L 195 305 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                          <path d="M 65 200 L 75 195 L 75 185 L 85 190 L 95 185 L 95 195 L 105 200 L 95 205 L 95 215 L 85 210 L 75 215 L 75 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                          <path d="M 295 200 L 305 195 L 305 185 L 315 190 L 325 185 L 325 195 L 335 200 L 325 205 L 325 215 L 315 210 L 305 215 L 305 205 Z" fill="none" stroke="#FFD54F" stroke-width="2" opacity="0.6"/>
-                      </g>
-
-                      <path d="M 110 110 L 140 140 L 140 260 L 110 290 M 290 110 L 260 140 L 260 260 L 290 290" fill="none" stroke="#FF8F00" stroke-width="2" opacity="0.3" />
-                      <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="url(#gold-dark-btn)" opacity="0.4" />
-                      <polygon points="200,115 273,157 273,243 200,285 127,243 127,157" fill="none" stroke="#FFC107" stroke-width="3" filter="url(#neon-glow-btn)" />
-
-                      <text x="200" y="215" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="#000" text-anchor="middle" letter-spacing="2">LSPK</text>
-                      <text x="200" y="210" font-size="80" font-family="'Arial Black', Impact, sans-serif" font-weight="900" fill="url(#gold-bright-btn)" text-anchor="middle" letter-spacing="2" filter="url(#neon-glow-btn)">LSPK</text>
-                      <text x="200" y="255" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFCA28" text-anchor="middle" letter-spacing="10" opacity="0.8">TOKEN</text>
-                      
-                      <path d="M 60 200 A 140 140 0 0 1 340 200" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.1" filter="blur(2px)"/>
-                      <path d="M 90 120 A 130 130 0 0 1 200 70" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.4" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Энергия -->
-              <div class="w-full max-w-[300px] mb-4">
-                  <div class="flex justify-between items-center mb-1.5 px-1">
-                      <span class="text-[#848E9C] text-[10px] font-bold uppercase flex items-center gap-1"><i data-lucide="zap" width="12" height="12" class="text-[#FCD535]"></i> Энергия</span>
-                      <span class="text-white font-bold text-[10px]" id="ui-energy-text">200 / 200</span>
-                  </div>
-                  <div class="w-full h-2 bg-[#181A20] border border-[#2B3139] rounded-full overflow-hidden">
-                      <div id="ui-energy-bar" class="h-full bg-gradient-to-r from-[#FEE140] to-[#F3BA2F]" style="width: 100%;"></div>
-                  </div>
-              </div>
-
-              <div class="w-full max-w-[300px] bg-[#181A20] border border-[#2B3139] rounded-2xl p-4 text-center">
-                <div class="flex justify-center gap-1.5 text-[#FCD535] font-bold mb-1 items-center">
-                    <i data-lucide="bot" width="16" height="16" fill="currentColor"></i>
-                    <span class="text-xs tracking-widest uppercase" id="ui-auto-status">Ожидание команд...</span>
-                </div>
-                <div class="text-[10px] text-[#848E9C]">Работает только офлайн (макс: <span id="ui-offline-hours">12</span> ч.)</div>
-              </div>
-            </div>
-
-            <!-- Вкладка: КОШЕЛЕК -->
-            <div id="tab-wallet" class="hidden flex-1 flex flex-col px-4 pt-6 pb-4">
-                
-                <div id="wallet-register" class="flex flex-col items-center justify-center h-full text-center">
-                  <div class="w-20 h-20 bg-[#FCD535]/10 rounded-full flex items-center justify-center mb-6">
-                      <i data-lucide="wallet" class="text-[#FCD535]" width="40" height="40"></i>
-                  </div>
-                  <h2 class="text-2xl font-black text-white mb-2">Открыть кошелёк</h2>
-                  <p class="text-[#848E9C] text-sm mb-6 px-4">Пройдите регистрацию и получите 200 ₽ и 50 LSPK на счет!</p>
-                  <form id="register-form" class="w-full max-w-[300px] space-y-3">
-                    <input id="reg-fname" required placeholder="Имя" class="w-full bg-[#181A20] border border-[#2B3139] rounded-xl p-4 text-white outline-none focus:border-[#FCD535]" />
-                    <input id="reg-lname" required placeholder="Фамилия" class="w-full bg-[#181A20] border border-[#2B3139] rounded-xl p-4 text-white outline-none focus:border-[#FCD535]" />
-                    <input id="reg-uname" required placeholder="уникальный_ник" class="w-full bg-[#181A20] border border-[#2B3139] rounded-xl p-4 text-white outline-none focus:border-[#FCD535]" />
-                    <p id="reg-error" class="text-[#F6465D] text-xs font-bold hidden"></p>
-                    <button type="submit" id="reg-btn" class="w-full bg-[#FCD535] text-black font-black py-4 rounded-xl active:scale-95 transition-transform">Получить бонус</button>
-                  </form>
-                </div>
-
-                <div id="wallet-main" class="hidden space-y-4 pb-10">
-                  <div class="flex items-center gap-3 bg-[#181A20] p-4 rounded-2xl border border-[#2B3139]">
-                    <div id="ui-wallet-avatar" class="w-12 h-12 bg-gradient-to-br from-[#FEE140] to-[#F3BA2F] rounded-full flex items-center justify-center font-black text-black text-lg"></div>
-                    <div>
-                        <p class="text-white font-bold" id="ui-wallet-name"></p>
-                        <p class="text-[#848E9C] text-xs font-mono" id="ui-wallet-uname"></p>
-                    </div>
-                  </div>
-
-                  <div class="bg-gradient-to-br from-[#1e232d] to-[#181A20] p-6 rounded-3xl border border-[#2B3139] shadow-xl">
-                    <span class="text-[#848E9C] text-[10px] uppercase font-black tracking-widest">Основной баланс</span>
-                    <div class="text-4xl font-black text-white font-mono mt-1 mb-4"><span id="ui-rub-balance">0</span> <span class="text-xl text-[#848E9C]">₽</span></div>
-                    
-                    <button onclick="window.appAPI.goToExchangeCategory('stocks')" class="w-full bg-[#2B3139] py-3.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all text-white">
-                        <i data-lucide="bar-chart-2" class="text-[#FCD535]" width="16" height="16"></i> Вложить
-                    </button>
-                  </div>
-
-                  <!-- БЛОК LSPK ТОКЕНА С ПРЕМИУМ ЛОГОТИПОМ -->
-                  <div class="bg-[#181A20] p-6 rounded-3xl border border-[#2B3139] shadow-xl relative overflow-hidden flex flex-col gap-4">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-[#FCD535]/10 rounded-full blur-3xl pointer-events-none"></div>
-                    
-                    <div class="flex justify-between items-start relative z-10">
-                      <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 shrink-0 flex items-center justify-center">
-                            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
-                                <circle cx="50" cy="50" r="46" fill="none" stroke="#FF9800" stroke-width="8" stroke-dasharray="2 3" />
-                                <circle cx="50" cy="50" r="42" fill="#FFC107" />
-                                <circle cx="50" cy="50" r="34" fill="#11151C" />
-                                <polygon points="50,22 74,36 74,64 50,78 26,64 26,36" fill="none" stroke="#FFC107" stroke-width="2" />
-                                <text x="50" y="58" font-family="'Arial Black', Impact, sans-serif" font-size="24" font-weight="900" fill="#FFFFFF" text-anchor="middle" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.5))">LSPK</text>
-                            </svg>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[#848E9C] text-[10px] uppercase font-black tracking-widest mb-1">LSPK Токены</span>
-                            <div class="text-3xl font-black text-white font-mono leading-none tracking-tight"><span id="ui-wallet-lspk-balance">0</span></div>
-                        </div>
-                      </div>
-                      <span class="bg-[#2B3139]/50 text-[#848E9C] text-[10px] px-2 py-1 rounded font-bold shrink-0 border border-white/5">Ожидает листинга</span>
-                    </div>
-
-                    <button onclick="window.appAPI.goToExchangeCategory('coins')" class="w-full bg-[#2B3139] py-3.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all text-white relative z-10">
-                        <i data-lucide="bar-chart-2" class="text-[#FCD535]" width="16" height="16"></i> Торговать
-                    </button>
-                  </div>
-
-                  <div class="space-y-3 pt-2">
-                    <h3 class="text-[#848E9C] text-[10px] uppercase font-black tracking-[0.2em] ml-1">Мои Активы</h3>
-                    <div id="wallet-portfolio-list"></div>
-                    <div id="wallet-portfolio-empty" class="hidden bg-[#181A20]/50 border border-dashed border-[#2B3139] rounded-3xl p-6 text-center flex flex-col items-center justify-center gap-3">
-                         <p class="text-[#848E9C] text-xs">У вас пока нет купленных активов</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div id="wallet-transfer" class="hidden flex flex-col h-full"></div>
-            </div>
-
-            <!-- Вкладка: БИРЖА -->
-            <div id="tab-exchange" class="hidden flex-1 flex flex-col px-4 pb-4">
-                <div id="exchange-categories" class="space-y-3 mt-4">
-                      <h2 class="text-lg font-bold text-white mb-2 ml-1 uppercase tracking-widest text-[10px] text-[#848E9C]">Биржевые Рынки</h2>
-                      <button data-cat="stocks" class="btn-category w-full bg-[#181A20] p-5 rounded-2xl border border-[#2B3139] flex items-center gap-4 active:scale-95 shadow-lg">
-                         <div class="w-12 h-12 rounded-full bg-[#0ECB81]/10 flex items-center justify-center"><i data-lucide="building-2" class="text-[#0ECB81]"></i></div>
-                         <div class="text-left"><p class="text-white font-bold text-lg">Акции</p><p class="text-[#848E9C] text-xs">Рынок ценных бумаг колледжа</p></div>
-                         <i data-lucide="chevron-right" class="ml-auto text-[#848E9C]"></i>
-                      </button>
-                      <button data-cat="coins" class="btn-category w-full bg-[#181A20] p-5 rounded-2xl border border-[#2B3139] flex items-center gap-4 active:scale-95 shadow-lg">
-                         <div class="w-12 h-12 rounded-full bg-[#FCD535]/10 flex items-center justify-center shrink-0">
-                             <i data-lucide="coins" class="text-[#FCD535]" width="24" height="24"></i>
-                         </div>
-                         <div class="text-left"><p class="text-white font-bold text-lg">Койны</p><p class="text-[#848E9C] text-xs">LSPK и внешние активы</p></div>
-                         <i data-lucide="chevron-right" class="ml-auto text-[#848E9C]"></i>
-                      </button>
-                </div>
-                <div id="exchange-list" class="hidden">
-                    <button id="btn-back-categories" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
-                    <div id="exchange-assets-container" class="space-y-2"></div>
-                </div>
-                
-                <div id="exchange-terminal" class="hidden flex flex-col h-full">
-                     <div class="flex items-center justify-between mb-4">
-                        <button id="btn-back-list" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
-                        <div class="text-center">
-                            <h2 id="terminal-pair" class="text-lg font-black text-white leading-none uppercase tracking-tighter"></h2>
-                            <p class="text-[9px] text-[#0ECB81] uppercase font-black tracking-widest flex items-center gap-1 justify-center"><i data-lucide="activity" width="8" height="8"></i> Market Real-time</p>
-                        </div>
-                        <div class="w-10"></div>
-                     </div>
-                     <div class="w-full h-40 bg-[#161a25] rounded-3xl mb-4 relative overflow-hidden border border-white/5 shadow-inner">
-                        <div id="terminal-chart-container" class="w-full h-full"></div>
-                        <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-white border border-white/10 flex items-center gap-2">
-                           <span id="terminal-price-dot" class="w-1.5 h-1.5 rounded-full animate-pulse bg-[#0ECB81]"></span>
-                           <span id="terminal-current-price">0 ₽</span>
-                        </div>
-                     </div>
-                     <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex flex-col flex-1 shadow-2xl">
-                        <div class="flex bg-[#0B0E14] p-1 rounded-xl mb-6 border border-[#2B3139]">
-                           <button id="btn-mode-buy" class="flex-1 py-2.5 rounded-lg font-black text-sm transition-all bg-[#0ECB81] text-white shadow-lg">КУПИТЬ</button>
-                           <button id="btn-mode-sell" class="flex-1 py-2.5 rounded-lg font-black text-sm transition-all text-[#848E9C]">ПРОДАТЬ</button>
-                        </div>
-                        <div class="flex justify-between items-end text-[10px] text-[#848E9C] mb-3 px-1 font-bold uppercase tracking-tight">
-                           <div class="flex flex-col"><span>Доступно</span><span id="terminal-available" class="text-white font-mono text-sm"></span></div>
-                           <button id="btn-max-trade" class="bg-[#2B3139] text-[#FCD535] px-2 py-1 rounded-md active:scale-95">МАКС</button>
-                        </div>
-                        <div class="relative mb-6">
-                           <input id="trade-amount" type="number" placeholder="0" class="w-full bg-[#0B0E14] border border-[#2B3139] rounded-2xl p-5 text-2xl font-black text-white outline-none focus:border-[#FCD535]" />
-                           <span id="terminal-ticker-label" class="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-[#848E9C]"></span>
-                        </div>
-                        <div class="mt-auto border-t border-white/5 pt-5 mb-5 flex justify-between items-center">
-                           <span class="text-[#848E9C] text-xs font-bold">ИТОГО</span>
-                           <span class="text-2xl font-black text-white"><span id="terminal-total-cost">0</span> <span class="text-sm text-[#848E9C]">₽</span></span>
-                        </div>
-                        <button id="btn-confirm-trade" class="w-full py-4.5 rounded-2xl font-black text-lg active:scale-[0.98] transition-all shadow-xl text-white bg-[#0ECB81] shadow-[#0ECB81]/10">ПОДТВЕРДИТЬ ПОКУПКУ</button>
-                     </div>
-                </div>
-
-                <div id="exchange-listing" class="hidden flex flex-col h-full items-center justify-center pb-20">
-                     <div class="w-full flex items-center mb-auto pt-4">
-                        <button id="btn-back-list-listing" class="p-3 -ml-2 text-[#848E9C] active:scale-90"><i data-lucide="chevron-left" width="28" height="28"></i></button>
-                     </div>
-                     <div class="bg-[#2B3139] px-8 py-6 rounded-3xl border border-white/5 shadow-2xl">
-                         <span class="text-[#0ECB81] font-black text-xl tracking-widest uppercase">Ожидайте листинг</span>
-                     </div>
-                     <div class="mt-auto"></div>
-                </div>
-            </div>
-
-            <!-- Вкладка: БУСТЫ -->
-            <div id="tab-boosts" class="hidden flex-1 flex flex-col px-4 pb-4">
-               <div class="mt-4 space-y-4">
-                  <h2 class="text-[#848E9C] text-[10px] font-black uppercase tracking-[0.2em] ml-1 mb-2 text-center">Прокачка мощностей</h2>
-                  
-                  <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
-                    <div class="flex items-center gap-4">
-                      <div class="w-14 h-14 rounded-2xl bg-[#FCD535]/10 flex items-center justify-center border border-[#FCD535]/20"><i data-lucide="mouse-pointer-click" class="text-[#FCD535]" width="28" height="28"></i></div>
-                      <div class="flex flex-col"><h3 class="font-black text-white text-sm uppercase">Мультитап</h3><p class="text-[#848E9C] text-[10px] mt-0.5 uppercase">Сила клика: <span class="text-[#0ECB81] font-bold">+1 LSPK</span></p></div>
-                    </div>
-                    <button id="btn-upgrade-click" class="bg-[#FCD535] text-black px-5 py-2.5 rounded-xl font-black text-[11px] active:scale-95 transition-all flex flex-col items-center shadow-lg shadow-[#FCD535]/10 disabled:opacity-30 disabled:active:scale-100">
-                      <span id="ui-cost-click"></span><span class="text-[8px] opacity-60">LSPK</span>
-                    </button>
-                  </div>
-                  
-                  <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
-                    <div class="flex items-center gap-4">
-                      <div class="w-14 h-14 rounded-2xl bg-[#2962FF]/10 flex items-center justify-center border border-[#2962FF]/20"><i data-lucide="bot" class="text-[#2962FF]" width="28" height="28"></i></div>
-                      <div class="flex flex-col"><h3 class="font-black text-white text-sm uppercase">Автокликер</h3><p class="text-[#848E9C] text-[10px] mt-0.5 uppercase">Авто-добыча: <span class="text-white font-bold">+1 / сек.</span></p></div>
-                    </div>
-                    <button id="btn-upgrade-auto" class="bg-[#FCD535] text-black px-5 py-2.5 rounded-xl font-black text-[11px] active:scale-95 transition-all flex flex-col items-center shadow-lg shadow-[#FCD535]/10 disabled:opacity-30 disabled:active:scale-100">
-                      <span id="ui-cost-auto"></span><span class="text-[8px] opacity-60">LSPK</span>
-                    </button>
-                  </div>
-
-                  <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
-                    <div class="flex items-center gap-4">
-                      <div class="w-14 h-14 rounded-2xl bg-[#0ECB81]/10 flex items-center justify-center border border-[#0ECB81]/20"><i data-lucide="battery-charging" class="text-[#0ECB81]" width="28" height="28"></i></div>
-                      <div class="flex flex-col"><h3 class="font-black text-white text-sm uppercase">Батарейка</h3><p class="text-[#848E9C] text-[10px] mt-0.5 uppercase">Энергия: <span class="text-[#0ECB81] font-bold">+100 ЕД.</span></p></div>
-                    </div>
-                    <button id="btn-upgrade-battery" class="bg-[#FCD535] text-black px-5 py-2.5 rounded-xl font-black text-[11px] active:scale-95 transition-all flex flex-col items-center shadow-lg shadow-[#FCD535]/10 disabled:opacity-30 disabled:active:scale-100">
-                      <span id="ui-cost-battery"></span><span class="text-[8px] opacity-60">LSPK</span>
-                    </button>
-                  </div>
-               </div>
-            </div>
-
-        </main>
-
-        <nav class="bg-[#181A20] border-t border-white/5 flex justify-between px-6 pt-3 pb-8 shrink-0 rounded-t-[2.5rem] shadow-2xl relative z-50">
-          <button data-tab="mine" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-white"><i data-lucide="coins" class="icon text-[#FCD535]" width="24" height="24"></i><span class="text-[9px] font-black uppercase tracking-widest">Кликер</span></button>
-          <button data-tab="exchange" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#848E9C] opacity-50"><i data-lucide="bar-chart-3" class="icon" width="24" height="24"></i><span class="text-[9px] font-black uppercase tracking-widest">Биржа</span></button>
-          <button data-tab="wallet" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#848E9C] opacity-50"><i data-lucide="wallet" class="icon" width="24" height="24"></i><span class="text-[9px] font-black uppercase tracking-widest">Кошелёк</span></button>
-          <button data-tab="boosts" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-[#848E9C] opacity-50"><i data-lucide="zap" class="icon" width="24" height="24"></i><span class="text-[9px] font-black uppercase tracking-widest">Бусты</span></button>
-        </nav>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        lucide.createIcons();
-
-        // === НАСТРОЙКИ FIREBASE ===
-        const firebaseConfig = {
-            apiKey: "AIzaSyBy2X53f_J97ofALfTQALq1TWXoFSZX2PE",
-            authDomain: "lspk-tocen.firebaseapp.com",
-            projectId: "lspk-tocen",
-            storageBucket: "lspk-tocen.firebasestorage.app",
-            messagingSenderId: "582952786678",
-            appId: "1:582952786678:web:8331700cbf62bac65d2ad7"
-        };
-
-        const hasFirebase = !!firebaseConfig.apiKey;
-        let app, auth, db;
-        const appId = 'lspk-clicker-app';
-
-        if (hasFirebase) {
-            try { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } 
-            catch(e) { console.error("Ошибка Firebase:", e); }
+        // Очищаем предыдущие классы
+        formMessage.className = 'message-area';
+        
+        if (!text) {
+          formMessage.innerHTML = '';
+          return;
         }
+        
+        // Добавляем соответствующий класс стилей
+        formMessage.classList.add(isSuccess ? 'success-message' : 'error-message');
+        
+        // Иконка в зависимости от типа
+        const icon = isSuccess ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+        formMessage.innerHTML = `${icon} ${text}`;
+      }
 
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if (tg) {
-            tg.ready(); tg.expand(); tg.disableVerticalSwipes(); 
-            tg.setHeaderColor('#0B0E14'); tg.setBackgroundColor('#0B0E14');
-        }
-        const tgUser = tg?.initDataUnsafe?.user;
+      /**
+       * Простейшая валидация email
+       * @param {string} email 
+       * @returns {boolean}
+       */
+      function isValidEmail(email) {
+        // Базовая проверка: есть @ и точка в домене, без пробелов
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email.trim());
+      }
 
-        const getSimpleLspkLogo = (sizeClass) => `
-        <div class="${sizeClass} shrink-0 flex items-center justify-center">
-            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
-                <circle cx="50" cy="50" r="46" fill="none" stroke="#FF9800" stroke-width="8" stroke-dasharray="2 3" />
-                <circle cx="50" cy="50" r="42" fill="#FFC107" />
-                <circle cx="50" cy="50" r="34" fill="#11151C" />
-                <polygon points="50,22 74,36 74,64 50,78 26,64 26,36" fill="none" stroke="#FFC107" stroke-width="2" />
-                <text x="50" y="58" font-family="'Arial Black', Impact, sans-serif" font-size="24" font-weight="900" fill="#FFFFFF" text-anchor="middle" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.5))">LSPK</text>
-            </svg>
-        </div>`;
-
-        // === ИГРОВОЕ СОСТОЯНИЕ ===
-        // ДОБАВЛЕНА БЛОКИРОВКА isDataLoaded ДЛЯ ЗАЩИТЫ ОТ ОБНУЛЕНИЯ БАЗЫ
-        let state = {
-            isDataLoaded: false,
-            effectiveUserId: null,
-            balance: 0,
-            clickPower: 1,      
-            autoRate: 0,        
-            energy: 200,        
-            maxEnergy: 200,     
-            maxOfflineHours: 12, 
-            portfolio: { bufx: 0, tepx: 0, kafx: 0 },
-            stockPrices: { bufx: 200, tepx: 250, kafx: 165 },
-            priceHistory: { bufx: Array(20).fill(200), tepx: Array(20).fill(250), kafx: Array(20).fill(165) },
-            walletInfo: { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 }
-        };
-
-        let uiState = { activeTab: 'mine', walletView: 'main', exchangeView: 'categories', tradeMode: 'buy', selectedStock: null, transferCurrency: 'rub' };
-
-        const stocksList = [
-            { id: 'bufx', name: 'Буфет', ticker: 'BUFX', price: 200, icon: 'store', color: '#F3BA2F' },
-            { id: 'tepx', name: 'Теплица', ticker: 'TEPX', price: 250, icon: 'leaf', color: '#0ECB81' },
-            { id: 'kafx', name: 'Кафе', ticker: 'KAFX', price: 165, icon: 'coffee', color: '#2962FF' },
-        ];
-        const coinsList = [{ id: 'lspk', name: 'LSPK Token', ticker: 'LSPK', price: null, status: 'не объявлена', icon: 'gem', color: '#FCD535' }];
-
-        function showNotification(msg) {
-            const toast = document.getElementById('notification-toast');
-            document.getElementById('notification-text').innerText = msg;
-            toast.classList.remove('hidden', 'opacity-0', 'translate-y-[-20px]');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-[-20px]');
-                setTimeout(() => toast.classList.add('hidden'), 300);
-            }, 3500);
-        }
-
-        function formatNum(num) { return Math.floor(num).toLocaleString('ru-RU'); }
-
-        // === ОБНОВЛЕНИЕ UI ===
-        function updateAllUI() {
-            if (!state.isDataLoaded) return;
-
-            document.getElementById('ui-main-balance').innerText = formatNum(state.balance);
-            document.getElementById('ui-click-power').innerText = state.clickPower;
-            document.getElementById('ui-auto-rate').innerText = state.autoRate;
-            document.getElementById('ui-offline-hours').innerText = state.maxOfflineHours;
-            document.getElementById('ui-energy-text').innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
-            document.getElementById('ui-energy-bar').style.width = `${(state.energy / state.maxEnergy) * 100}%`;
-
-            if(state.autoRate > 0) {
-                document.getElementById('ui-auto-status').innerText = "Автокликер готов к работе";
-                document.getElementById('ui-auto-status').classList.replace("text-[#848E9C]", "text-[#0ECB81]");
-            }
-
-            const clickMaxed = state.clickPower >= 12;
-            const autoMaxed = state.autoRate >= 12;
-            const batteryMaxed = state.maxEnergy >= 1000;
-
-            const clickCost = clickMaxed ? 0 : Math.floor(50 * Math.pow(1.5, state.clickPower - 1));
-            const autoCost = autoMaxed ? 0 : Math.floor(100 * Math.pow(1.5, state.autoRate));
-            const batteryCost = batteryMaxed ? 0 : Math.floor(150 * Math.pow(1.5, (state.maxEnergy - 200) / 100));
-
-            const setupBoostBtn = (id, isMaxed, cost) => {
-                const btn = document.getElementById(id);
-                if (isMaxed) {
-                    btn.disabled = true;
-                    btn.className = 'bg-[#2B3139] px-4 py-2.5 rounded-xl flex items-center justify-center';
-                    btn.innerHTML = '<span class="text-[#0ECB81] font-black text-[12px] uppercase tracking-widest">Прокачено</span>';
-                } else {
-                    btn.disabled = state.balance < cost;
-                    btn.className = 'bg-[#FCD535] text-black px-5 py-2.5 rounded-xl font-black text-[11px] active:scale-95 transition-all flex flex-col items-center shadow-lg shadow-[#FCD535]/10 disabled:opacity-30 disabled:active:scale-100';
-                    btn.innerHTML = `<span class="font-bold text-sm">${formatNum(cost)}</span><span class="text-[8px] opacity-60 uppercase">LSPK</span>`;
-                }
-            };
-
-            setupBoostBtn('btn-upgrade-click', clickMaxed, clickCost);
-            setupBoostBtn('btn-upgrade-auto', autoMaxed, autoCost);
-            setupBoostBtn('btn-upgrade-battery', batteryMaxed, batteryCost);
-
-            renderWallet(); renderTerminal(); renderExchangeList();
-        }
-
-        function renderWallet() {
-            const elReg = document.getElementById('wallet-register');
-            const elMain = document.getElementById('wallet-main');
-            
-            elReg.classList.add('hidden'); elMain.classList.add('hidden');
-
-            if (!state.walletInfo.registered) {
-                elReg.classList.remove('hidden');
-            } else if (uiState.walletView === 'main') {
-                elMain.classList.remove('hidden');
-                document.getElementById('ui-wallet-avatar').innerText = (state.walletInfo.firstName[0] || '') + (state.walletInfo.lastName[0] || '');
-                document.getElementById('ui-wallet-name').innerText = `${state.walletInfo.firstName} ${state.walletInfo.lastName}`;
-                document.getElementById('ui-wallet-uname').innerText = `@${state.walletInfo.username}`;
-                document.getElementById('ui-rub-balance').innerText = formatNum(state.walletInfo.rubBalance);
-                document.getElementById('ui-wallet-lspk-balance').innerText = formatNum(state.balance);
-
-                const portfolioList = document.getElementById('wallet-portfolio-list');
-                const portfolioEmpty = document.getElementById('wallet-portfolio-empty');
-                portfolioList.innerHTML = '';
-                let hasAssets = false;
-                stocksList.forEach(stock => {
-                    if (state.portfolio[stock.id] > 0) {
-                        hasAssets = true;
-                        const currentPrice = state.stockPrices[stock.id] || stock.price;
-                        portfolioList.innerHTML += `
-                        <div class="bg-[#181A20] border border-[#2B3139] rounded-3xl p-4 shadow-lg overflow-hidden mb-2">
-                           <div class="flex items-center justify-between">
-                              <div class="flex items-center gap-3">
-                                 <div class="w-10 h-10 bg-[#2B3139] rounded-2xl flex items-center justify-center"><i data-lucide="${stock.icon}" width="20" height="20" style="color: ${stock.color}"></i></div>
-                                 <div><p class="text-white font-black text-sm uppercase">${stock.ticker}</p><p class="text-[#848E9C] text-[10px]">${stock.name}</p></div>
-                              </div>
-                              <div class="text-right">
-                                 <p class="text-white font-black text-lg">${state.portfolio[stock.id]} <span class="text-[10px] text-[#848E9C]">шт</span></p>
-                                 <p class="text-[#0ECB81] text-[10px] font-mono">≈ ${formatNum(state.portfolio[stock.id] * currentPrice)} ₽</p>
-                              </div>
-                           </div>
-                        </div>`;
-                    }
-                });
-                portfolioEmpty.classList.toggle('hidden', hasAssets);
-                lucide.createIcons();
-            }
-        }
-
-        function renderExchangeList() {
-            if(uiState.exchangeView !== 'list') return;
-            const container = document.getElementById('exchange-assets-container');
-            container.innerHTML = '';
-            const list = uiState.exchangeCategory === 'stocks' ? stocksList : coinsList;
-            
-            list.forEach(stock => {
-                const currentPrice = state.stockPrices[stock.id] || stock.price;
-                const count = stock.id === 'lspk' ? Math.floor(state.balance) : (state.portfolio[stock.id] || 0);
-                
-                const iconHtml = stock.id === 'lspk' 
-                    ? getSimpleLspkLogo("w-10 h-10")
-                    : `<div class="w-10 h-10 bg-[#2B3139] rounded-full flex items-center justify-center shrink-0"><i data-lucide="${stock.icon}" width="18" height="18" style="color:${stock.color}"></i></div>`;
-
-                container.innerHTML += `
-                    <div onclick="window.appAPI.openTerminal('${stock.id}')" class="bg-[#181A20] p-4 rounded-2xl border border-[#2B3139] flex items-center justify-between cursor-pointer active:bg-[#2B3139]/30 transition-colors mb-2">
-                       <div class="flex items-center gap-3">
-                          ${iconHtml}
-                          <div><p class="text-white font-bold">${stock.ticker}</p><p class="text-[#848E9C] text-[10px]">${stock.name}</p></div>
-                       </div>
-                       <div class="text-right">
-                          <p class="text-white font-mono font-bold text-sm">${currentPrice ? formatNum(currentPrice) + ' ₽' : 'не объявлена'}</p>
-                          <p class="text-[10px] text-[#848E9C]">Портфель: ${formatNum(count)}</p>
-                       </div>
-                    </div>`;
-            });
-            lucide.createIcons();
-        }
-
-        function renderTerminal() {
-            if(uiState.exchangeView !== 'terminal' || !uiState.selectedStock) return;
-            const stock = uiState.selectedStock;
-            const price = state.stockPrices[stock.id] || stock.price || 0;
-            const isBuy = uiState.tradeMode === 'buy';
-            document.getElementById('terminal-pair').innerText = `${stock.ticker}/RUB`;
-            document.getElementById('terminal-price-dot').className = `w-1.5 h-1.5 rounded-full animate-pulse ${isBuy ? 'bg-[#0ECB81]' : 'bg-[#F6465D]'}`;
-            document.getElementById('terminal-current-price').innerText = `${price} ₽`;
-            document.getElementById('btn-mode-buy').className = `flex-1 py-2.5 rounded-lg font-black text-sm transition-all ${isBuy ? 'bg-[#0ECB81] text-white shadow-lg' : 'text-[#848E9C]'}`;
-            document.getElementById('btn-mode-sell').className = `flex-1 py-2.5 rounded-lg font-black text-sm transition-all ${!isBuy ? 'bg-[#F6465D] text-white shadow-lg' : 'text-[#848E9C]'}`;
-            document.getElementById('terminal-available').innerText = isBuy ? `${formatNum(state.walletInfo.rubBalance)} ₽` : `${state.portfolio[stock.id] || 0} ${stock.ticker}`;
-            const amount = Math.floor(parseFloat(document.getElementById('trade-amount').value || 0));
-            document.getElementById('terminal-ticker-label').innerText = stock.ticker;
-            document.getElementById('terminal-total-cost').innerText = formatNum(amount * price);
-            const btn = document.getElementById('btn-confirm-trade');
-            btn.innerText = isBuy ? 'ПОДТВЕРДИТЬ ПОКУПКУ' : 'ПОДТВЕРДИТЬ ПРОДАЖУ';
-            btn.className = `w-full py-4.5 rounded-2xl font-black text-lg active:scale-[0.98] transition-all shadow-xl text-white ${isBuy ? 'bg-[#0ECB81] shadow-[#0ECB81]/10' : 'bg-[#F6465D] shadow-[#F6465D]/10'}`;
-            const chartData = state.priceHistory[stock.id] || Array(20).fill(price);
-            const color = isBuy ? '#0ECB81' : '#F6465D';
-            const min = Math.min(...chartData) * 0.99; const max = Math.max(...chartData) * 1.01; const range = max - min || 1;
-            const points = chartData.map((val, i) => `${(i / 19) * 340},${160 - ((val - min) / range) * 160}`).join(' ');
-            document.getElementById('terminal-chart-container').innerHTML = `<svg class="w-full h-full" viewBox="0 0 340 160" preserveAspectRatio="none"><defs><linearGradient id="grad-chart" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.3" /><stop offset="100%" stop-color="${color}" stop-opacity="0" /></linearGradient></defs><path d="M 0,160 L ${points} L 340,160 Z" fill="url(#grad-chart)" /><polyline fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${points}" /></svg>`;
-        }
-
-        function switchTab(tabId) {
-            uiState.activeTab = tabId;
-            ['mine', 'wallet', 'exchange', 'boosts'].forEach(t => document.getElementById(`tab-${t}`).classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const balHeader = document.getElementById('global-balance-header');
-            if((tabId === 'mine') && !uiState.selectedStock) balHeader.classList.remove('hidden'); else balHeader.classList.add('hidden');
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                const isActive = btn.dataset.tab === tabId;
-                btn.className = `nav-btn flex flex-col items-center gap-1.5 transition-all ${isActive ? 'text-white' : 'text-[#848E9C] opacity-50'}`;
-                const icon = btn.querySelector('.icon'); if(icon) icon.classList.toggle('text-[#FCD535]', isActive);
-            });
-            if(tabId === 'exchange') switchExchangeView('categories');
-            if(tabId === 'wallet') { uiState.walletView = 'main'; renderWallet(); }
-            updateAllUI();
-        }
-
-        function switchExchangeView(view) {
-            uiState.exchangeView = view;
-            ['categories', 'list', 'terminal', 'listing'].forEach(v => {
-                const el = document.getElementById(`exchange-${v}`);
-                if (el) el.classList.add('hidden');
-            });
-            const activeEl = document.getElementById(`exchange-${view}`);
-            if (activeEl) activeEl.classList.remove('hidden');
-            
-            document.getElementById('global-balance-header').classList.add('hidden');
-            if(view === 'list') renderExchangeList(); 
-            if(view === 'terminal') renderTerminal();
-        }
-
-        // === ИНИЦИАЛИЗАЦИЯ И FIREBASE ===
-        async function initApp() {
-            let persistentUserId = tgUser?.id?.toString();
-            if (!persistentUserId) {
-                persistentUserId = localStorage.getItem('lspk_device_id');
-                if (!persistentUserId) { persistentUserId = 'web_user_' + Date.now(); localStorage.setItem('lspk_device_id', persistentUserId); }
-            }
-            state.effectiveUserId = persistentUserId;
-
-            const applyLoadedData = (data) => {
-                state.clickPower = data.clickPower || 1; state.autoRate = data.autoRate || 0;
-                state.energy = data.energy !== undefined ? data.energy : 200; state.maxEnergy = data.maxEnergy || 200;
-                state.portfolio = data.portfolio || { bufx: 0, tepx: 0, kafx: 0 }; state.stockPrices = data.stockPrices || { bufx: 200, tepx: 250, kafx: 165 };
-                if(data.priceHistory) state.priceHistory = data.priceHistory;
-                state.walletInfo = data.walletInfo || { registered: false, firstName: '', lastName: '', username: '', rubBalance: 0 };
-                
-                const now = Date.now(); const offlineSeconds = Math.floor((now - (data.lastTime || now)) / 1000);
-                const earnedOffline = Math.min(offlineSeconds, 12 * 3600) * state.autoRate;
-                state.balance = (data.balance || 0) + earnedOffline;
-                state.energy = Math.min(state.maxEnergy, state.energy + (offlineSeconds * (state.maxEnergy / 60)));
-                if (Math.floor(earnedOffline) > 0) setTimeout(() => showNotification(`🤖 Автокликер добыл +${formatNum(earnedOffline)} LSPK!`), 2500);
-            };
-
-            // Ждем базу данных и как минимум 1.5 секунды для экрана загрузки
-            let minLoadingTime = new Promise(resolve => setTimeout(resolve, 1500));
-            let dbLoadPromise = Promise.resolve();
-
-            if (hasFirebase && db) {
-                dbLoadPromise = (async () => {
-                    try { if (auth) await signInAnonymously(auth); } catch(e) {}
-                    try {
-                        const docSnap = await getDoc(doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current'));
-                        if (docSnap.exists()) applyLoadedData(docSnap.data());
-                    } catch(e) {}
-                })();
+      /**
+       * Имитация отправки данных на сервер (без реального запроса)
+       * @param {string} email 
+       * @returns {Promise<{success: boolean, message?: string}>}
+       */
+      function mockSubscribeEmail(email) {
+        // Симуляция асинхронной операции (например fetch)
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            // Для демонстрации: всегда успех, если email валиден.
+            // В реальном коде здесь был бы запрос к API.
+            if (isValidEmail(email)) {
+              resolve({ 
+                success: true, 
+                message: `Готово! Мы отправим уведомление на ${email}` 
+              });
             } else {
-                try { const localSave = localStorage.getItem('lspk_local_save'); if (localSave) applyLoadedData(JSON.parse(localSave)); } catch(e) {}
+              resolve({ 
+                success: false, 
+                message: 'Пожалуйста, введите корректный email адрес.' 
+              });
             }
+          }, 800); // небольшая задержка для реалистичности
+        });
+      }
 
-            // Ждем завершения обоих процессов
-            await Promise.all([dbLoadPromise, minLoadingTime]);
-
-            // Разрешаем игре работать (защита от сохранения нулей)
-            state.isDataLoaded = true;
-
-            document.getElementById('loading-text').innerText = "Готово!";
-            setTimeout(() => {
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('app-container').classList.remove('hidden');
-                updateAllUI(); 
-                startLoops();
-            }, 300);
+      /**
+       * Обработчик нажатия на кнопку "Сообщить"
+       */
+      async function handleNotifyClick() {
+        // Очищаем предыдущее сообщение
+        showMessage('');
+        
+        const email = emailInput.value.trim();
+        
+        // Базовая проверка на пустое поле
+        if (!email) {
+          showMessage('Введите email адрес', false);
+          emailInput.focus();
+          return;
         }
-
-        // ФУНКЦИЯ СОХРАНЕНИЯ С ЗАЩИТОЙ
-        function saveGame() {
-            if (!state.isDataLoaded) return; // ПРЕДОТВРАЩАЕТ СТИРАНИЕ ДАННЫХ В ОБЛАКЕ
-
-            const saveData = { balance: state.balance, clickPower: state.clickPower, autoRate: state.autoRate, energy: state.energy, maxEnergy: state.maxEnergy, portfolio: state.portfolio, walletInfo: state.walletInfo, stockPrices: state.stockPrices, priceHistory: state.priceHistory, lastTime: Date.now() };
-            localStorage.setItem('lspk_local_save', JSON.stringify(saveData));
-            if(hasFirebase && db && state.effectiveUserId) setDoc(doc(db, 'artifacts', appId, 'users', state.effectiveUserId, 'gameState', 'current'), saveData, { merge: true }).catch(()=>{});
+        
+        // Дополнительная проверка формата (дублируется в mock, но для UI хорошо)
+        if (!isValidEmail(email)) {
+          showMessage('Некорректный формат email. Пример: name@domain.ru', false);
+          emailInput.focus();
+          return;
         }
-
-        function startLoops() {
-            setInterval(() => {
-                if (!state.isDataLoaded) return;
-                if (state.energy < state.maxEnergy) { state.energy = Math.min(state.maxEnergy, state.energy + (state.maxEnergy / 60) * 0.2); updateAllUI(); }
-            }, 200);
-            setInterval(() => {
-                if (!state.isDataLoaded) return;
-                Object.keys(state.stockPrices).forEach(key => {
-                    const jitter = (Math.random() - 0.5) * 0.001;
-                    state.stockPrices[key] = Math.max(1, Math.round(state.stockPrices[key] * (1 + jitter)));
-                    const hist = state.priceHistory[key] || Array(20).fill(state.stockPrices[key]); hist.shift(); hist.push(state.stockPrices[key]); state.priceHistory[key] = hist;
-                });
-                if(uiState.activeTab === 'exchange') { if(uiState.exchangeView === 'terminal') renderTerminal(); else if(uiState.exchangeView === 'list') renderExchangeList(); }
-            }, 5000);
-            setInterval(saveGame, 10000);
+        
+        // Блокируем кнопку и меняем текст, чтобы избежать двойной отправки
+        const originalButtonText = notifyButton.innerHTML;
+        notifyButton.disabled = true;
+        notifyButton.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Отправка...';
+        
+        try {
+          const result = await mockSubscribeEmail(email);
+          
+          if (result.success) {
+            showMessage(result.message, true);
+            // Очищаем поле ввода после успешной подписки
+            emailInput.value = '';
+          } else {
+            showMessage(result.message || 'Ошибка подписки. Попробуйте позже.', false);
+          }
+        } catch (error) {
+          // На случай непредвиденной ошибки
+          showMessage('Произошла ошибка. Проверьте соединение.', false);
+          console.error('Notify error:', error);
+        } finally {
+          // Возвращаем кнопку в исходное состояние
+          notifyButton.disabled = false;
+          notifyButton.innerHTML = originalButtonText;
         }
+      }
 
-        function handleTap(clientX, clientY) {
-            // Защита: не даем кликать, пока данные не скачаны
-            if (!state.isDataLoaded || state.energy < state.clickPower) return;
-            
-            state.energy -= state.clickPower; state.balance += state.clickPower;
-            updateAllUI();
-            const clickEl = document.createElement('div');
-            clickEl.className = "pointer-events-none fixed z-50 animate-float-up text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(252,213,53,0.8)]";
-            clickEl.innerText = `+${state.clickPower}`; clickEl.style.left = `${clientX - 10}px`; clickEl.style.top = `${clientY - 30}px`;
-            document.body.appendChild(clickEl); setTimeout(() => clickEl.remove(), 800);
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        }
+      // Назначаем обработчик события на кнопку
+      if (notifyButton) {
+        notifyButton.addEventListener('click', handleNotifyClick);
+      }
 
-        const coinBtn = document.getElementById('coin-button');
-        coinBtn.addEventListener('touchstart', (e) => { e.preventDefault(); for (let i = 0; i < e.changedTouches.length; i++) handleTap(e.changedTouches[i].clientX, e.changedTouches[i].clientY); });
-        coinBtn.addEventListener('mousedown', (e) => handleTap(e.clientX, e.clientY));
-
-        // Логика кнопок прокачки
-        document.getElementById('btn-upgrade-click').addEventListener('click', () => {
-            if (!state.isDataLoaded || state.clickPower >= 12) return;
-            const cost = Math.floor(50 * Math.pow(1.5, state.clickPower - 1));
-            if(state.balance >= cost) { state.balance -= cost; state.clickPower += 1; showNotification(`Улучшено! Сила клика: +${state.clickPower}`); updateAllUI(); saveGame(); }
+      // Дополнительно: отправка по нажатию Enter в поле ввода
+      if (emailInput) {
+        emailInput.addEventListener('keypress', function(event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            handleNotifyClick();
+          }
         });
-        document.getElementById('btn-upgrade-auto').addEventListener('click', () => {
-            if (!state.isDataLoaded || state.autoRate >= 12) return;
-            const cost = Math.floor(100 * Math.pow(1.5, state.autoRate));
-            if(state.balance >= cost) { state.balance -= cost; state.autoRate += 1; showNotification(`Автокликер запущен: ${state.autoRate} /сек`); updateAllUI(); saveGame(); }
+      }
+
+      // Автоматическая очистка сообщения при вводе нового текста (опционально)
+      if (emailInput) {
+        emailInput.addEventListener('input', function() {
+          // Убираем сообщение об ошибке/успехе когда пользователь начинает печатать
+          if (formMessage && formMessage.innerHTML.trim() !== '') {
+            showMessage('');
+          }
         });
-        document.getElementById('btn-upgrade-battery').addEventListener('click', () => {
-            if (!state.isDataLoaded || state.maxEnergy >= 1000) return;
-            const cost = Math.floor(150 * Math.pow(1.5, (state.maxEnergy - 200) / 100));
-            if(state.balance >= cost) { state.balance -= cost; state.maxEnergy += 100; showNotification(`Энергия увеличена! Макс: ${state.maxEnergy}`); updateAllUI(); saveGame(); }
-        });
-
-        document.addEventListener('click', function(e) {
-            const navBtn = e.target.closest('.nav-btn');
-            if (navBtn) { switchTab(navBtn.dataset.tab); return; }
-            const btnCat = e.target.closest('.btn-category');
-            if (btnCat) { uiState.exchangeCategory = btnCat.dataset.cat; switchExchangeView('list'); return; }
-        });
-
-        document.getElementById('btn-back-categories').addEventListener('click', () => switchExchangeView('categories'));
-        document.getElementById('btn-back-list').addEventListener('click', () => { uiState.selectedStock = null; switchExchangeView('list'); });
-        document.getElementById('btn-back-list-listing').addEventListener('click', () => { uiState.selectedStock = null; switchExchangeView('list'); });
-
-        document.getElementById('btn-mode-buy').addEventListener('click', () => { uiState.tradeMode = 'buy'; document.getElementById('trade-amount').value=''; renderTerminal(); });
-        document.getElementById('btn-mode-sell').addEventListener('click', () => { uiState.tradeMode = 'sell'; document.getElementById('trade-amount').value=''; renderTerminal(); });
-        document.getElementById('trade-amount').addEventListener('input', renderTerminal);
-        document.getElementById('btn-max-trade').addEventListener('click', () => {
-            const s = uiState.selectedStock; const p = state.stockPrices[s.id] || s.price;
-            if(uiState.tradeMode === 'buy') document.getElementById('trade-amount').value = Math.floor(state.walletInfo.rubBalance / p); else document.getElementById('trade-amount').value = state.portfolio[s.id] || 0;
-            renderTerminal();
-        });
-        document.getElementById('btn-confirm-trade').addEventListener('click', () => {
-            const amount = Math.floor(parseFloat(document.getElementById('trade-amount').value));
-            const s = uiState.selectedStock; if(!amount || amount <= 0 || !s) return;
-            const p = state.stockPrices[s.id] || s.price; const cost = amount * p;
-            if (uiState.tradeMode === 'buy' && state.walletInfo.rubBalance >= cost) {
-                state.walletInfo.rubBalance -= cost; state.portfolio[s.id] = (state.portfolio[s.id] || 0) + amount;
-                showNotification(`Куплено ${amount} ${s.ticker}`);
-            } else if (uiState.tradeMode === 'sell' && (state.portfolio[s.id] || 0) >= amount) {
-                state.portfolio[s.id] -= amount; state.walletInfo.rubBalance += cost;
-                showNotification(`Продано ${amount} ${s.ticker}`);
-            } else { showNotification('Недостаточно средств'); return; }
-            document.getElementById('trade-amount').value = ''; updateAllUI(); saveGame();
-        });
-
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const fn = document.getElementById('reg-fname').value.trim(); const ln = document.getElementById('reg-lname').value.trim(); const un = document.getElementById('reg-uname').value.trim().toLowerCase();
-            const err = document.getElementById('reg-error'); const btn = document.getElementById('reg-btn');
-            err.classList.add('hidden'); btn.innerText = 'Создание...'; btn.disabled = true;
-            if (hasFirebase && db && state.effectiveUserId) {
-                try {
-                    const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'usernames'));
-                    if (snap.docs.some(d => d.id === un)) { err.innerText = 'Ник занят!'; err.classList.remove('hidden'); btn.innerText = 'Получить бонус'; btn.disabled = false; return; }
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'usernames', un), { uid: state.effectiveUserId });
-                    state.walletInfo = { registered: true, firstName: fn, lastName: ln, username: un, rubBalance: 200 };
-                    state.balance += 50; showNotification('Бонус +50 LSPK и 200 ₽ получен! 🎁');
-                } catch(ex) { err.innerText='Ошибка сети'; err.classList.remove('hidden'); btn.innerText = 'Получить бонус'; btn.disabled = false; return; }
-            } else {
-                state.walletInfo = { registered: true, firstName: fn, lastName: ln, username: un, rubBalance: 200 };
-                state.balance += 50; showNotification('Бонус +50 LSPK и 200 ₽ получен! 🎁');
-            }
-            uiState.walletView = 'main'; updateAllUI(); btn.innerText = 'Получить бонус'; btn.disabled = false; saveGame();
-        });
-
-        window.appAPI = {
-            goToExchangeCategory: (cat) => { switchTab('exchange'); uiState.exchangeCategory = cat; switchExchangeView('list'); },
-            goToExchange: (id, m) => { const s = stocksList.find(x => x.id === id); switchTab('exchange'); uiState.exchangeCategory = 'stocks'; uiState.selectedStock = s; uiState.tradeMode = m; switchExchangeView('terminal'); },
-            openTerminal: (id) => { 
-                const s = [...stocksList, ...coinsList].find(x => x.id === id); 
-                uiState.selectedStock = s; 
-                if(id === 'lspk') { switchExchangeView('listing'); return; } 
-                uiState.tradeMode = 'buy'; switchExchangeView('terminal'); 
-            }
-        };
-
-        // Защита от сохранения при закрытии вкладки, если данные не загрузились
-        window.addEventListener('beforeunload', () => { if(state.isDataLoaded) saveGame(); });
-        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && state.isDataLoaded) saveGame(); });
-
-        initApp();
-    </script>
+      }
+    })();
+  </script>
 </body>
 </html>
